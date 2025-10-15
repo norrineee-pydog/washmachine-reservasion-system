@@ -1,0 +1,25 @@
+<!--pages/message/message.wxml-->
+<view class="container">
+  <!-- 消息列表 -->
+  <view class="message-list">
+    <view class="message-item" wx:for="{{messageList}}" wx:key="id" bindtap="viewMessage" data-message="{{item}}">
+      <view class="message-icon {{item.type}}">{{item.icon}}</view>
+      <view class="message-content">
+        <view class="message-header">
+          <text class="message-title">{{item.title}}</text>
+          <text class="message-time">{{item.time}}</text>
+        </view>
+        <text class="message-desc">{{item.content}}</text>
+      </view>
+      <view class="message-status">
+        <view class="unread-dot" wx:if="{{!item.read}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{messageList.length === 0}}">
+    <view class="empty-icon">💬</view>
+    <text class="empty-text">暂无消息</text>
+  </view>
+</view>

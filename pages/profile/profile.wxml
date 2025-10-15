@@ -1,0 +1,134 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-info">
+      <view class="user-avatar">
+        <image src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" class="avatar-img"></image>
+        <view class="avatar-badge" wx:if="{{userInfo.level}}">{{userInfo.level}}</view>
+      </view>
+      <view class="user-details">
+        <view class="user-name">{{userInfo.nickName || '未登录'}}</view>
+        <view class="user-id">学号：{{userInfo.studentId || '未设置'}}</view>
+        <view class="user-location">{{userInfo.buildingName}} {{userInfo.roomNumber}}</view>
+      </view>
+    </view>
+    
+    <view class="credit-info">
+      <view class="credit-score">
+        <text class="score-number">{{userInfo.creditScore || 100}}</text>
+        <text class="score-label">信用积分</text>
+      </view>
+      <view class="credit-level">
+        <text class="level-text">{{userInfo.level || '青铜'}}</text>
+        <view class="level-progress">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{creditProgress}}%"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-group">
+      <view class="menu-item" bindtap="goToPage" data-url="/pages/booking/booking">
+        <view class="menu-icon booking">📅</view>
+        <text class="menu-text">我的预约</text>
+        <view class="menu-badge" wx:if="{{bookingCount > 0}}">{{bookingCount}}</view>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="goToPage" data-url="/pages/message/message">
+        <view class="menu-icon message">💬</view>
+        <text class="menu-text">消息中心</text>
+        <view class="menu-badge" wx:if="{{messageCount > 0}}">{{messageCount}}</view>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="goToPage" data-url="/pages/credit/credit">
+        <view class="menu-icon credit">🏆</view>
+        <text class="menu-text">信用中心</text>
+        <text class="menu-arrow">></text>
+      </view>
+    </view>
+
+    <view class="menu-group">
+      <view class="menu-item" bindtap="goToPage" data-url="/pages/help/help">
+        <view class="menu-icon help">❓</view>
+        <text class="menu-text">帮助中心</text>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="goToPage" data-url="/pages/settings/settings">
+        <view class="menu-icon settings">⚙️</view>
+        <text class="menu-text">设置</text>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="goToPage" data-url="/pages/about/about">
+        <view class="menu-icon about">ℹ️</view>
+        <text class="menu-text">关于我们</text>
+        <text class="menu-arrow">></text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 使用统计 -->
+  <view class="statistics-section">
+    <view class="section-header">
+      <text class="section-title">使用统计</text>
+    </view>
+    
+    <view class="statistics-grid">
+      <view class="stat-item">
+        <text class="stat-number">{{statistics.totalBookings}}</text>
+        <text class="stat-label">总预约次数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{statistics.successRate}}%</text>
+        <text class="stat-label">成功率</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{statistics.avgWaitTime}}</text>
+        <text class="stat-label">平均等待</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{statistics.totalTime}}</text>
+        <text class="stat-label">总使用时长</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 最近活动 -->
+  <view class="activity-section">
+    <view class="section-header">
+      <text class="section-title">最近活动</text>
+      <text class="view-all" bindtap="viewAllActivity">查看全部</text>
+    </view>
+    
+    <view class="activity-list">
+      <view class="activity-item" wx:for="{{recentActivities}}" wx:key="id">
+        <view class="activity-icon {{item.type}}">{{item.icon}}</view>
+        <view class="activity-content">
+          <text class="activity-title">{{item.title}}</text>
+          <text class="activity-time">{{item.time}}</text>
+        </view>
+        <view class="activity-status">
+          <text class="status-text">{{item.status}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-section" wx:if="{{userInfo}}">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 登录按钮 -->
+  <view class="login-section" wx:if="{{!userInfo}}">
+    <button class="login-btn" bindtap="goToLogin">立即登录</button>
+  </view>
+</view>

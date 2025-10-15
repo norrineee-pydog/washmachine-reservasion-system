@@ -1,0 +1,179 @@
+<!--pages/building/building.wxml-->
+<view class="container">
+  <!-- 顶部搜索栏 -->
+  <view class="search-section">
+    <view class="search-bar">
+      <view class="search-icon">🔍</view>
+      <input class="search-input" placeholder="搜索楼栋名称" value="{{searchKeyword}}" bindinput="onSearchInput" />
+      <view class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</view>
+    </view>
+  </view>
+
+  <!-- 当前位置 -->
+  <view class="current-location" wx:if="{{currentBuilding}}">
+    <view class="location-header">
+      <text class="location-title">当前位置</text>
+      <text class="location-refresh" bindtap="refreshLocation">🔄 刷新</text>
+    </view>
+    <view class="current-building-card" bindtap="selectBuilding" data-building="{{currentBuilding}}">
+      <view class="building-info">
+        <view class="building-name">{{currentBuilding.name}}</view>
+        <view class="building-detail">
+          <text class="building-floors">{{currentBuilding.floors}}层</text>
+          <text class="building-washers">{{currentBuilding.washerCount}}台洗衣机</text>
+        </view>
+      </view>
+      <view class="building-status">
+        <view class="status-tag current">当前</view>
+        <view class="status-detail">
+          <text class="idle-count">{{currentBuilding.idleCount}}台空闲</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收藏楼栋 -->
+  <view class="favorite-section" wx:if="{{favoriteBuildings.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">收藏楼栋</text>
+    </view>
+    <view class="favorite-list">
+      <view class="building-card favorite" wx:for="{{favoriteBuildings}}" wx:key="id" bindtap="selectBuilding" data-building="{{item}}">
+        <view class="building-info">
+          <view class="building-name">{{item.name}}</view>
+          <view class="building-detail">
+            <text class="building-floors">{{item.floors}}层</text>
+            <text class="building-washers">{{item.washerCount}}台洗衣机</text>
+          </view>
+        </view>
+        <view class="building-status">
+          <view class="status-tag favorite-tag">收藏</view>
+          <view class="status-detail">
+            <text class="idle-count">{{item.idleCount}}台空闲</text>
+          </view>
+        </view>
+        <view class="favorite-icon" bindtap="removeFavorite" data-building="{{item}}" catchtap="true">❤️</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 所有楼栋 -->
+  <view class="all-buildings-section">
+    <view class="section-header">
+      <text class="section-title">所有楼栋</text>
+      <view class="view-mode">
+        <view class="mode-btn {{viewMode === 'list' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="list">列表</view>
+        <view class="mode-btn {{viewMode === 'map' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="map">地图</view>
+      </view>
+    </view>
+
+    <!-- 列表模式 -->
+    <view class="building-list" wx:if="{{viewMode === 'list'}}">
+      <view class="building-card" wx:for="{{filteredBuildings}}" wx:key="id" bindtap="selectBuilding" data-building="{{item}}">
+        <view class="building-info">
+          <view class="building-name">{{item.name}}</view>
+          <view class="building-detail">
+            <text class="building-floors">{{item.floors}}层</text>
+            <text class="building-washers">{{item.washerCount}}台洗衣机</text>
+            <text class="building-distance" wx:if="{{item.distance}}">距离{{item.distance}}m</text>
+          </view>
+        </view>
+        <view class="building-status">
+          <view class="status-summary">
+            <view class="status-item">
+              <text class="status-count idle">{{item.idleCount}}</text>
+              <text class="status-label">空闲</text>
+            </view>
+            <view class="status-item">
+              <text class="status-count working">{{item.workingCount}}</text>
+              <text class="status-label">使用中</text>
+            </view>
+          </view>
+          <view class="status-detail">
+            <text class="idle-rate">空闲率 {{item.idleRate}}%</text>
+          </view>
+        </view>
+        <view class="building-actions">
+          <view class="action-btn favorite" bindtap="toggleFavorite" data-building="{{item}}" catchtap="true">
+            {{item.isFavorite ? '❤️' : '🤍'}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 地图模式 -->
+    <view class="building-map" wx:if="{{viewMode === 'map'}}">
+      <map 
+        id="buildingMap" 
+        class="map-container"
+        longitude="{{mapCenter.longitude}}"
+        latitude="{{mapCenter.latitude}}"
+        scale="{{mapScale}}"
+        markers="{{mapMarkers}}"
+        bindmarkertap="onMarkerTap"
+        bindregionchange="onRegionChange"
+      >
+        <cover-view class="map-controls">
+          <cover-view class="control-btn" bindtap="centerToCurrent">📍</cover-view>
+          <cover-view class="control-btn" bindtap="zoomIn">+</cover-view>
+          <cover-view class="control-btn" bindtap="zoomOut">-</cover-view>
+        </cover-view>
+      </map>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{filteredBuildings.length === 0 && searchKeyword}}">
+    <view class="empty-icon">🔍</view>
+    <text class="empty-text">未找到相关楼栋</text>
+    <text class="empty-desc">请尝试其他关键词</text>
+  </view>
+</view>
+
+<!-- 楼栋详情弹窗 -->
+<view class="building-detail-modal" wx:if="{{showDetailModal}}" bindtap="closeDetailModal">
+  <view class="modal-content" catchtap="preventClose">
+    <view class="modal-header">
+      <text class="modal-title">{{selectedBuilding.name}}</text>
+      <view class="modal-close" bindtap="closeDetailModal">✕</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="detail-section">
+        <view class="detail-title">基本信息</view>
+        <view class="detail-item">
+          <text class="detail-label">楼层数：</text>
+          <text class="detail-value">{{selectedBuilding.floors}}层</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">洗衣机总数：</text>
+          <text class="detail-value">{{selectedBuilding.washerCount}}台</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">当前空闲：</text>
+          <text class="detail-value">{{selectedBuilding.idleCount}}台</text>
+        </view>
+      </view>
+
+      <view class="detail-section">
+        <view class="detail-title">楼层分布</view>
+        <view class="floor-list">
+          <view class="floor-item" wx:for="{{selectedBuilding.floorDetails}}" wx:key="floor" bindtap="goToFloor" data-floor="{{item.floor}}">
+            <view class="floor-info">
+              <text class="floor-name">{{item.floor}}楼</text>
+              <text class="floor-washers">{{item.washerCount}}台洗衣机</text>
+            </view>
+            <view class="floor-status">
+              <text class="floor-idle">{{item.idleCount}}台空闲</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="modal-btn secondary" bindtap="closeDetailModal">取消</button>
+      <button class="modal-btn primary" bindtap="confirmSelectBuilding">选择此楼栋</button>
+    </view>
+  </view>
+</view>

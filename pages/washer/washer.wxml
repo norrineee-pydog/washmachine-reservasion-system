@@ -1,0 +1,60 @@
+<!--pages/washer/washer.wxml-->
+<view class="container">
+  <!-- 楼栋/楼层头部 -->
+  <view class="header">
+    <view class="building-info">
+      <text class="building-name">{{building.name}}</text>
+      <picker class="floor-picker" mode="selector" range="{{floorOptions}}" value="{{floorIndex}}" bindchange="onFloorChange">
+        <view class="picker-inner">
+          <text class="picker-text">{{floorOptions[floorIndex]}}</text>
+          <text class="picker-arrow">></text>
+        </view>
+      </picker>
+    </view>
+    <view class="summary">
+      <text class="sum-item idle">空闲 {{summary.idle}}</text>
+      <text class="sum-item working">使用中 {{summary.working}}</text>
+      <text class="sum-item booking">预约中 {{summary.booking}}</text>
+      <text class="sum-item ready">待取衣 {{summary.ready}}</text>
+    </view>
+  </view>
+
+  <!-- 过滤与排序 -->
+  <view class="toolbar">
+    <scroll-view class="chips" scroll-x>
+      <view class="chip {{filterStatus==='all'?'active':''}}" data-status="all" bindtap="onFilterStatus">全部</view>
+      <view class="chip {{filterStatus==='idle'?'active':''}}" data-status="idle" bindtap="onFilterStatus">空闲</view>
+      <view class="chip {{filterStatus==='working'?'active':''}}" data-status="working" bindtap="onFilterStatus">使用中</view>
+      <view class="chip {{filterStatus==='booking'?'active':''}}" data-status="booking" bindtap="onFilterStatus">预约中</view>
+      <view class="chip {{filterStatus==='ready'?'active':''}}" data-status="ready" bindtap="onFilterStatus">待取衣</view>
+    </scroll-view>
+    <view class="sort" bindtap="toggleSort">
+      <text class="sort-text">按可用时间{{sortAsc?'↑':'↓'}}</text>
+    </view>
+  </view>
+
+  <!-- 洗衣机网格 -->
+  <view class="grid">
+    <view class="card" wx:for="{{displayWashers}}" wx:key="id" bindtap="onSelectWasher" data-washer="{{item}}">
+      <view class="card-top">
+        <text class="card-name">{{item.name}}</text>
+        <text class="status-tag status-{{item.status}}">{{item.statusText}}</text>
+      </view>
+      <view class="card-middle">
+        <text class="location">{{item.location}}</text>
+        <text class="remain" wx:if="{{item.remainingTime}}">{{item.remainingTime}}</text>
+      </view>
+      <view class="card-actions">
+        <view class="btn primary" wx:if="{{item.status==='idle'}}">预约</view>
+        <view class="btn disabled" wx:else>不可用</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{displayWashers.length===0}}">
+    <view class="empty-icon">🧺</view>
+    <text class="empty-text">暂无符合条件的设备</text>
+  </view>
+</view>
+

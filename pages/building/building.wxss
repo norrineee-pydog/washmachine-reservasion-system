@@ -1,0 +1,480 @@
+/* pages/building/building.wxss */
+
+/* 搜索区域 */
+.search-section {
+  margin-bottom: 30rpx;
+}
+
+.search-bar {
+  background: #fff;
+  border-radius: 50rpx;
+  padding: 20rpx 30rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.search-icon {
+  font-size: 32rpx;
+  color: #999;
+  margin-right: 20rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.search-clear {
+  font-size: 28rpx;
+  color: #999;
+  padding: 10rpx;
+}
+
+/* 当前位置 */
+.current-location {
+  margin-bottom: 30rpx;
+}
+
+.location-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.location-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.location-refresh {
+  font-size: 26rpx;
+  color: #4A90E2;
+  padding: 10rpx 20rpx;
+  border-radius: 20rpx;
+  background: #f0f7ff;
+}
+
+.current-building-card {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8rpx 24rpx rgba(74, 144, 226, 0.3);
+}
+
+.building-info {
+  flex: 1;
+}
+
+.building-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 10rpx;
+}
+
+.building-detail {
+  font-size: 24rpx;
+  opacity: 0.9;
+}
+
+.building-floors, .building-washers {
+  margin-right: 20rpx;
+}
+
+.building-status {
+  text-align: right;
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.status-tag.current {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.status-tag.favorite-tag {
+  background: #fff2f0;
+  color: #ff4d4f;
+  border: 1rpx solid #ffccc7;
+}
+
+.status-detail {
+  font-size: 22rpx;
+  opacity: 0.8;
+}
+
+/* 收藏楼栋 */
+.favorite-section {
+  margin-bottom: 30rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.view-mode {
+  display: flex;
+  background: #f0f0f0;
+  border-radius: 20rpx;
+  padding: 4rpx;
+}
+
+.mode-btn {
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  color: #666;
+  border-radius: 16rpx;
+  transition: all 0.3s;
+}
+
+.mode-btn.active {
+  background: #4A90E2;
+  color: #fff;
+}
+
+/* 楼栋列表 */
+.building-list {
+  margin-top: 20rpx;
+}
+
+.building-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.building-card.favorite {
+  border: 2rpx solid #ff4d4f;
+}
+
+.building-info {
+  flex: 1;
+}
+
+.building-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.building-detail {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.building-floors, .building-washers, .building-distance {
+  margin-right: 20rpx;
+}
+
+.building-distance {
+  color: #4A90E2;
+}
+
+.building-status {
+  margin-right: 20rpx;
+  text-align: center;
+}
+
+.status-summary {
+  display: flex;
+  margin-bottom: 8rpx;
+}
+
+.status-item {
+  margin: 0 10rpx;
+  text-align: center;
+}
+
+.status-count {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 4rpx;
+}
+
+.status-count.idle {
+  color: #52C41A;
+}
+
+.status-count.working {
+  color: #FF4D4F;
+}
+
+.status-label {
+  font-size: 20rpx;
+  color: #999;
+}
+
+.idle-rate {
+  font-size: 22rpx;
+  color: #4A90E2;
+  font-weight: 500;
+}
+
+.building-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.action-btn {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  margin-bottom: 10rpx;
+}
+
+.action-btn.favorite {
+  background: #fff2f0;
+}
+
+.favorite-icon {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  font-size: 32rpx;
+  padding: 10rpx;
+}
+
+/* 地图模式 */
+.building-map {
+  margin-top: 20rpx;
+  height: 600rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+.map-controls {
+  position: absolute;
+  right: 20rpx;
+  top: 20rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.control-btn {
+  width: 60rpx;
+  height: 60rpx;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  margin-bottom: 10rpx;
+}
+
+.empty-desc {
+  font-size: 24rpx;
+}
+
+/* 楼栋详情弹窗 */
+.building-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 40rpx;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 20rpx;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-close {
+  font-size: 32rpx;
+  color: #999;
+  padding: 10rpx;
+}
+
+.modal-body {
+  padding: 30rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.detail-section {
+  margin-bottom: 40rpx;
+}
+
+.detail-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.floor-list {
+  margin-top: 20rpx;
+}
+
+.floor-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  margin-bottom: 15rpx;
+}
+
+.floor-info {
+  flex: 1;
+}
+
+.floor-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.floor-washers {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.floor-status {
+  text-align: right;
+}
+
+.floor-idle {
+  font-size: 24rpx;
+  color: #52C41A;
+  font-weight: 500;
+}
+
+.modal-footer {
+  display: flex;
+  padding: 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  border: none;
+  margin: 0 10rpx;
+}
+
+.modal-btn.secondary {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  color: #fff;
+}
+
+.modal-btn::after {
+  border: none;
+}

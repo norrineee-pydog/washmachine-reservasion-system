@@ -1,0 +1,57 @@
+<!--pages/help/help.wxml-->
+<view class="container">
+  <!-- 帮助分类 -->
+  <view class="help-categories">
+    <view class="category-item" bindtap="goToCategory" data-category="usage">
+      <view class="category-icon">📱</view>
+      <text class="category-text">使用指南</text>
+    </view>
+    <view class="category-item" bindtap="goToCategory" data-category="booking">
+      <view class="category-icon">📅</view>
+      <text class="category-text">预约流程</text>
+    </view>
+    <view class="category-item" bindtap="goToCategory" data-category="credit">
+      <view class="category-icon">🏆</view>
+      <text class="category-text">信用积分</text>
+    </view>
+    <view class="category-item" bindtap="goToCategory" data-category="troubleshoot">
+      <view class="category-icon">🔧</view>
+      <text class="category-text">故障排除</text>
+    </view>
+  </view>
+
+  <!-- 常见问题 -->
+  <view class="faq-section">
+    <view class="section-title">常见问题</view>
+    <view class="faq-list">
+      <view class="faq-item" wx:for="{{faqList}}" wx:key="id" bindtap="toggleFaq" data-id="{{item.id}}">
+        <view class="faq-question">
+          <text class="question-text">{{item.question}}</text>
+          <text class="toggle-icon {{item.expanded ? 'expanded' : ''}}">></text>
+        </view>
+        <view class="faq-answer {{item.expanded ? 'show' : ''}}">
+          <text class="answer-text">{{item.answer}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系我们 -->
+  <view class="contact-section">
+    <view class="section-title">联系我们</view>
+    <view class="contact-list">
+      <view class="contact-item" bindtap="makeCall">
+        <view class="contact-icon">📞</view>
+        <text class="contact-text">客服电话：400-123-4567</text>
+      </view>
+      <view class="contact-item" bindtap="sendEmail">
+        <view class="contact-icon">📧</view>
+        <text class="contact-text">邮箱：service@shu.edu.cn</text>
+      </view>
+      <view class="contact-item" bindtap="openWechat">
+        <view class="contact-icon">💬</view>
+        <text class="contact-text">微信客服：上大洗衣侠</text>
+      </view>
+    </view>
+  </view>
+</view>

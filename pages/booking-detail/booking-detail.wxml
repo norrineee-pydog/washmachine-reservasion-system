@@ -1,0 +1,49 @@
+<!--pages/booking-detail/booking-detail.wxml-->
+<view class="container">
+  <!-- 预约状态卡片 -->
+  <view class="status-card">
+    <view class="status-header">
+      <view class="status-icon {{booking.status}}">{{booking.statusIcon}}</view>
+      <view class="status-info">
+        <text class="status-text">{{booking.statusText}}</text>
+        <text class="status-desc">{{booking.statusDesc}}</text>
+      </view>
+    </view>
+    
+    <view class="countdown" wx:if="{{booking.remainingTime}}">
+      <text class="countdown-text">{{booking.remainingTime}}</text>
+    </view>
+  </view>
+
+  <!-- 预约详情 -->
+  <view class="detail-card">
+    <view class="card-title">预约详情</view>
+    
+    <view class="detail-item">
+      <text class="detail-label">楼栋</text>
+      <text class="detail-value">{{booking.buildingName}}</text>
+    </view>
+    
+    <view class="detail-item">
+      <text class="detail-label">洗衣机</text>
+      <text class="detail-value">{{booking.washerName}}</text>
+    </view>
+    
+    <view class="detail-item">
+      <text class="detail-label">预约时间</text>
+      <text class="detail-value">{{booking.bookingTime}}</text>
+    </view>
+    
+    <view class="detail-item">
+      <text class="detail-label">预约编号</text>
+      <text class="detail-value">{{booking.bookingId}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <button class="action-btn secondary" bindtap="cancelBooking" wx:if="{{booking.status === 'pending'}}">取消预约</button>
+    <button class="action-btn primary" bindtap="startWashing" wx:if="{{booking.status === 'ready'}}">开始洗衣</button>
+    <button class="action-btn success" bindtap="completeWashing" wx:if="{{booking.status === 'working'}}">完成洗衣</button>
+  </view>
+</view>

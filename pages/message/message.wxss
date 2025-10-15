@@ -1,0 +1,95 @@
+/* pages/message/message.wxss */
+
+.message-list {
+  margin-top: 20rpx;
+}
+
+.message-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.message-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  margin-right: 20rpx;
+}
+
+.message-icon.booking {
+  background: #f0f7ff;
+  color: #4A90E2;
+}
+
+.message-icon.system {
+  background: #f6ffed;
+  color: #52C41A;
+}
+
+.message-icon.warning {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.message-content {
+  flex: 1;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.message-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.message-time {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.message-desc {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.message-status {
+  position: relative;
+}
+
+.unread-dot {
+  width: 16rpx;
+  height: 16rpx;
+  background: #FF4D4F;
+  border-radius: 50%;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 120rpx 40rpx;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+}

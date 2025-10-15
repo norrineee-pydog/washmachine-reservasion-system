@@ -1,0 +1,71 @@
+<!--pages/credit/credit.wxml-->
+<view class="container">
+  <!-- 信用积分卡片 -->
+  <view class="credit-card">
+    <view class="credit-header">
+      <view class="credit-score">
+        <text class="score-number">{{userInfo.creditScore || 100}}</text>
+        <text class="score-label">信用积分</text>
+      </view>
+      <view class="credit-level">
+        <text class="level-text">{{userInfo.level || '青铜'}}</text>
+        <view class="level-progress">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{creditProgress}}%"></view>
+          </view>
+          <text class="progress-text">{{creditProgress}}%</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 积分规则 -->
+  <view class="rules-section">
+    <view class="section-title">积分规则</view>
+    <view class="rules-list">
+      <view class="rule-item">
+        <view class="rule-icon positive">+</view>
+        <text class="rule-text">按时使用预约</text>
+        <text class="rule-score">+2分</text>
+      </view>
+      <view class="rule-item">
+        <view class="rule-icon positive">+</view>
+        <text class="rule-text">提前取消预约</text>
+        <text class="rule-score">不扣分</text>
+      </view>
+      <view class="rule-item">
+        <view class="rule-icon negative">-</view>
+        <text class="rule-text">预约超时未到</text>
+        <text class="rule-score">-5分</text>
+      </view>
+      <view class="rule-item">
+        <view class="rule-icon negative">-</view>
+        <text class="rule-text">占用超时未取</text>
+        <text class="rule-score">-10分</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 等级特权 -->
+  <view class="privileges-section">
+    <view class="section-title">等级特权</view>
+    <view class="privileges-list">
+      <view class="privilege-item">
+        <view class="privilege-level bronze">青铜</view>
+        <text class="privilege-desc">基础功能</text>
+      </view>
+      <view class="privilege-item">
+        <view class="privilege-level silver">白银</view>
+        <text class="privilege-desc">提前预约特权</text>
+      </view>
+      <view class="privilege-item">
+        <view class="privilege-level gold">黄金</view>
+        <text class="privilege-desc">专属时段预约</text>
+      </view>
+      <view class="privilege-item">
+        <view class="privilege-level diamond">钻石</view>
+        <text class="privilege-desc">绿色通道权限</text>
+      </view>
+    </view>
+  </view>
+</view>

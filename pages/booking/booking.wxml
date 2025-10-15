@@ -1,0 +1,205 @@
+<!--pages/booking/booking.wxml-->
+<view class="container">
+  <!-- 当前预约状态 -->
+  <view class="current-booking" wx:if="{{currentBooking}}">
+    <view class="booking-card active">
+      <view class="booking-header">
+        <view class="booking-status">
+          <view class="status-icon">⏰</view>
+          <text class="status-text">{{currentBooking.statusText}}</text>
+        </view>
+        <view class="booking-time">{{currentBooking.remainingTime}}</view>
+      </view>
+      
+      <view class="booking-info">
+        <view class="booking-detail">
+          <text class="detail-label">楼栋：</text>
+          <text class="detail-value">{{currentBooking.buildingName}}</text>
+        </view>
+        <view class="booking-detail">
+          <text class="detail-label">洗衣机：</text>
+          <text class="detail-value">{{currentBooking.washerName}}</text>
+        </view>
+        <view class="booking-detail">
+          <text class="detail-label">预约时间：</text>
+          <text class="detail-value">{{currentBooking.bookingTime}}</text>
+        </view>
+      </view>
+      
+      <view class="booking-actions">
+        <button class="action-btn secondary" bindtap="cancelBooking">取消预约</button>
+        <button class="action-btn primary" bindtap="viewBookingDetail">查看详情</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速预约 -->
+  <view class="quick-booking-section">
+    <view class="section-header">
+      <text class="section-title">快速预约</text>
+      <text class="section-subtitle">选择当前空闲的洗衣机</text>
+    </view>
+    
+    <view class="quick-options">
+      <view class="option-item" bindtap="quickBook" data-type="immediate">
+        <view class="option-icon immediate">⚡</view>
+        <text class="option-text">立即预约</text>
+        <text class="option-desc">选择空闲洗衣机</text>
+      </view>
+      <view class="option-item" bindtap="quickBook" data-type="schedule">
+        <view class="option-icon schedule">📅</view>
+        <text class="option-text">时段预约</text>
+        <text class="option-desc">预约未来时段</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐时段 -->
+  <view class="recommendation-section" wx:if="{{recommendations.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">智能推荐</text>
+      <text class="section-subtitle">基于历史数据推荐最佳时段</text>
+    </view>
+    
+    <view class="recommendation-list">
+      <view class="recommendation-item" wx:for="{{recommendations}}" wx:key="id" bindtap="selectRecommendation" data-recommendation="{{item}}">
+        <view class="recommendation-time">
+          <text class="time-text">{{item.time}}</text>
+          <text class="time-desc">{{item.date}}</text>
+        </view>
+        <view class="recommendation-info">
+          <view class="recommendation-score">
+            <text class="score-text">推荐度 {{item.score}}%</text>
+            <view class="score-bar">
+              <view class="score-fill" style="width: {{item.score}}%"></view>
+            </view>
+          </view>
+          <text class="recommendation-desc">{{item.description}}</text>
+        </view>
+        <view class="recommendation-action">
+          <view class="action-btn small">预约</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预约历史 -->
+  <view class="history-section">
+    <view class="section-header">
+      <text class="section-title">预约历史</text>
+      <text class="view-all" bindtap="viewAllHistory">查看全部</text>
+    </view>
+    
+    <view class="history-list">
+      <view class="history-item" wx:for="{{bookingHistory}}" wx:key="id" bindtap="viewHistoryDetail" data-booking="{{item}}">
+        <view class="history-info">
+          <view class="history-time">{{item.bookingTime}}</view>
+          <view class="history-detail">
+            <text class="detail-text">{{item.buildingName}} {{item.washerName}}</text>
+            <text class="status-tag status-{{item.status}}">{{item.statusText}}</text>
+          </view>
+        </view>
+        <view class="history-arrow">></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 使用统计 -->
+  <view class="statistics-section">
+    <view class="section-header">
+      <text class="section-title">使用统计</text>
+    </view>
+    
+    <view class="statistics-grid">
+      <view class="stat-item">
+        <text class="stat-number">{{statistics.totalBookings}}</text>
+        <text class="stat-label">总预约次数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{statistics.successRate}}%</text>
+        <text class="stat-label">成功率</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{statistics.avgWaitTime}}</text>
+        <text class="stat-label">平均等待</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-number">{{statistics.creditScore}}</text>
+        <text class="stat-label">信用积分</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 时段选择弹窗 -->
+<view class="time-picker-modal" wx:if="{{showTimePicker}}" bindtap="closeTimePicker">
+  <view class="modal-content" catchtap="preventClose">
+    <view class="modal-header">
+      <text class="modal-title">选择预约时段</text>
+      <view class="modal-close" bindtap="closeTimePicker">✕</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="date-picker">
+        <view class="date-item {{selectedDate === item ? 'active' : ''}}" 
+              wx:for="{{availableDates}}" 
+              wx:key="date" 
+              bindtap="selectDate" 
+              data-date="{{item}}">
+          <text class="date-text">{{item.dateText}}</text>
+          <text class="date-desc">{{item.dayText}}</text>
+        </view>
+      </view>
+      
+      <view class="time-slots">
+        <view class="time-slot {{slot.available ? 'available' : 'unavailable'}} {{selectedTimeSlot === slot ? 'selected' : ''}}"
+              wx:for="{{timeSlots}}" 
+              wx:key="id" 
+              bindtap="selectTimeSlot" 
+              data-slot="{{slot}}">
+          <text class="slot-time">{{slot.time}}</text>
+          <text class="slot-status">{{slot.available ? '可预约' : '已满'}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="modal-footer">
+      <button class="modal-btn secondary" bindtap="closeTimePicker">取消</button>
+      <button class="modal-btn primary" bindtap="confirmTimeBooking" disabled="{{!selectedTimeSlot}}">确认预约</button>
+    </view>
+  </view>
+</view>
+
+<!-- 洗衣机选择弹窗 -->
+<view class="washer-picker-modal" wx:if="{{showWasherPicker}}" bindtap="closeWasherPicker">
+  <view class="modal-content" catchtap="preventClose">
+    <view class="modal-header">
+      <text class="modal-title">选择洗衣机</text>
+      <view class="modal-close" bindtap="closeWasherPicker">✕</view>
+    </view>
+    
+    <view class="modal-body">
+      <view class="washer-list">
+        <view class="washer-item {{washer.status === 'idle' ? 'available' : 'unavailable'}}"
+              wx:for="{{availableWashers}}" 
+              wx:key="id" 
+              bindtap="selectWasher" 
+              data-washer="{{washer}}">
+          <view class="washer-info">
+            <text class="washer-name">{{washer.name}}</text>
+            <text class="washer-location">{{washer.location}}</text>
+          </view>
+          <view class="washer-status">
+            <view class="status-tag status-{{washer.status}}">{{washer.statusText}}</view>
+            <text class="washer-distance" wx:if="{{washer.distance}}">距离{{washer.distance}}m</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="modal-footer">
+      <button class="modal-btn secondary" bindtap="closeWasherPicker">取消</button>
+      <button class="modal-btn primary" bindtap="confirmWasherBooking" disabled="{{!selectedWasher}}">确认预约</button>
+    </view>
+  </view>
+</view>

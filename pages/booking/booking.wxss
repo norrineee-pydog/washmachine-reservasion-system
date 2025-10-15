@@ -1,0 +1,606 @@
+/* pages/booking/booking.wxss */
+
+/* 当前预约状态 */
+.current-booking {
+  margin-bottom: 30rpx;
+}
+
+.booking-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.booking-card.active {
+  border-left: 8rpx solid #4A90E2;
+}
+
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.booking-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-icon {
+  font-size: 32rpx;
+  margin-right: 10rpx;
+}
+
+.status-text {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.booking-time {
+  font-size: 24rpx;
+  color: #4A90E2;
+  font-weight: 500;
+}
+
+.booking-info {
+  margin-bottom: 30rpx;
+}
+
+.booking-detail {
+  display: flex;
+  margin-bottom: 10rpx;
+}
+
+.detail-label {
+  font-size: 26rpx;
+  color: #666;
+  width: 120rpx;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.booking-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 70rpx;
+  border-radius: 35rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  border: none;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  color: #fff;
+}
+
+.action-btn.secondary {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.action-btn.small {
+  padding: 12rpx 24rpx;
+  height: auto;
+  font-size: 24rpx;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+/* 快速预约区域 */
+.quick-booking-section {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.section-subtitle {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.quick-options {
+  display: flex;
+  gap: 20rpx;
+}
+
+.option-item {
+  flex: 1;
+  background: #f8f9fa;
+  border-radius: 16rpx;
+  padding: 30rpx 20rpx;
+  text-align: center;
+  border: 2rpx solid transparent;
+  transition: all 0.3s;
+}
+
+.option-item:active {
+  border-color: #4A90E2;
+  background: #f0f7ff;
+}
+
+.option-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin: 0 auto 15rpx;
+}
+
+.option-icon.immediate {
+  background: linear-gradient(135deg, #52C41A 0%, #389E0D 100%);
+}
+
+.option-icon.schedule {
+  background: linear-gradient(135deg, #FAAD14 0%, #D48806 100%);
+}
+
+.option-text {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.option-desc {
+  font-size: 22rpx;
+  color: #666;
+}
+
+/* 推荐区域 */
+.recommendation-section {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-list {
+  margin-top: 20rpx;
+}
+
+.recommendation-item {
+  display: flex;
+  align-items: center;
+  padding: 25rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.recommendation-item:last-child {
+  border-bottom: none;
+}
+
+.recommendation-time {
+  width: 150rpx;
+  text-align: center;
+  margin-right: 20rpx;
+}
+
+.time-text {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5rpx;
+}
+
+.time-desc {
+  font-size: 22rpx;
+  color: #666;
+}
+
+.recommendation-info {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.recommendation-score {
+  margin-bottom: 8rpx;
+}
+
+.score-text {
+  font-size: 24rpx;
+  color: #4A90E2;
+  font-weight: 500;
+  margin-right: 15rpx;
+}
+
+.score-bar {
+  width: 100rpx;
+  height: 6rpx;
+  background: #f0f0f0;
+  border-radius: 3rpx;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4A90E2 0%, #357ABD 100%);
+  border-radius: 3rpx;
+  transition: width 0.3s;
+}
+
+.recommendation-desc {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.recommendation-action {
+  width: 100rpx;
+}
+
+/* 历史记录区域 */
+.history-section {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.view-all {
+  font-size: 26rpx;
+  color: #4A90E2;
+}
+
+.history-list {
+  margin-top: 20rpx;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-info {
+  flex: 1;
+}
+
+.history-time {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 8rpx;
+}
+
+.history-detail {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.detail-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+}
+
+.status-completed {
+  background: #f6ffed;
+  color: #52c41a;
+  border: 1rpx solid #b7eb8f;
+}
+
+.status-cancelled {
+  background: #fff2f0;
+  color: #ff4d4f;
+  border: 1rpx solid #ffccc7;
+}
+
+.status-pending {
+  background: #fff7e6;
+  color: #fa8c16;
+  border: 1rpx solid #ffd591;
+}
+
+.history-arrow {
+  color: #ccc;
+  font-size: 24rpx;
+}
+
+/* 统计区域 */
+.statistics-section {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.statistics-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20rpx;
+}
+
+.stat-item {
+  width: 50%;
+  text-align: center;
+  padding: 30rpx 20rpx;
+  border-right: 1rpx solid #f0f0f0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.stat-item:nth-child(2n) {
+  border-right: none;
+}
+
+.stat-item:nth-child(n+3) {
+  border-bottom: none;
+}
+
+.stat-number {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #4A90E2;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 弹窗样式 */
+.time-picker-modal, .washer-picker-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 40rpx;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 20rpx;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-close {
+  font-size: 32rpx;
+  color: #999;
+  padding: 10rpx;
+}
+
+.modal-body {
+  padding: 30rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* 日期选择器 */
+.date-picker {
+  display: flex;
+  gap: 15rpx;
+  margin-bottom: 30rpx;
+  overflow-x: auto;
+  padding-bottom: 10rpx;
+}
+
+.date-item {
+  min-width: 120rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 20rpx 15rpx;
+  text-align: center;
+  border: 2rpx solid transparent;
+}
+
+.date-item.active {
+  background: #f0f7ff;
+  border-color: #4A90E2;
+}
+
+.date-text {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5rpx;
+}
+
+.date-desc {
+  font-size: 22rpx;
+  color: #666;
+}
+
+/* 时间段选择 */
+.time-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15rpx;
+}
+
+.time-slot {
+  width: calc(33.333% - 10rpx);
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 20rpx 10rpx;
+  text-align: center;
+  border: 2rpx solid transparent;
+}
+
+.time-slot.available {
+  background: #f6ffed;
+  border-color: #b7eb8f;
+}
+
+.time-slot.unavailable {
+  background: #f5f5f5;
+  opacity: 0.5;
+}
+
+.time-slot.selected {
+  background: #f0f7ff;
+  border-color: #4A90E2;
+}
+
+.slot-time {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5rpx;
+}
+
+.slot-status {
+  font-size: 20rpx;
+  color: #666;
+}
+
+/* 洗衣机选择 */
+.washer-list {
+  margin-top: 20rpx;
+}
+
+.washer-item {
+  display: flex;
+  align-items: center;
+  padding: 25rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.washer-item:last-child {
+  border-bottom: none;
+}
+
+.washer-item.available {
+  background: #f6ffed;
+  border-radius: 12rpx;
+  padding: 25rpx 20rpx;
+  margin-bottom: 15rpx;
+}
+
+.washer-item.unavailable {
+  opacity: 0.5;
+}
+
+.washer-info {
+  flex: 1;
+}
+
+.washer-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.washer-location {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.washer-status {
+  text-align: right;
+}
+
+.washer-distance {
+  font-size: 22rpx;
+  color: #4A90E2;
+  margin-top: 5rpx;
+}
+
+.modal-footer {
+  display: flex;
+  padding: 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+  gap: 20rpx;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  border: none;
+}
+
+.modal-btn.secondary {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  color: #fff;
+}
+
+.modal-btn[disabled] {
+  background: #d9d9d9;
+  color: #999;
+}
+
+.modal-btn::after {
+  border: none;
+}
