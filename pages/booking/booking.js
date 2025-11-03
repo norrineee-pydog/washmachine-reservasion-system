@@ -19,7 +19,9 @@ Page({
     selectedWasher: null,
     availableDates: [],
     timeSlots: [],
-    availableWashers: []
+    availableWashers: [],
+    availableWasherCount: 0,
+    countdownTimer: null
   },
 
   onLoad() {
@@ -30,6 +32,18 @@ Page({
   onShow() {
     console.log('预约页面显示')
     this.loadData()
+    // 延迟启动倒计时，确保数据已加载
+    setTimeout(() => {
+      this.startCountdown()
+    }, 100)
+  },
+
+  onHide() {
+    this.stopCountdown()
+  },
+
+  onUnload() {
+    this.stopCountdown()
   },
 
   onPullDownRefresh() {
@@ -44,6 +58,7 @@ Page({
     this.loadBookingHistory()
     this.loadStatistics()
     this.initAvailableDates()
+    this.loadAvailableWashers() // 加载可用洗衣机数量
   },
 
   // 加载数据
@@ -55,77 +70,191 @@ Page({
 
   // 加载当前预约
   loadCurrentBooking() {
-    // 模拟当前预约数据
+    // 从本地存储读取取消状态
+    const cancelledId = wx.getStorageSync('cancelledBookingId')
+    
+    // 如果当前预约已被取消，则不显示
+    if (cancelledId === 1) {
+      this.setData({ currentBooking: null })
+      return
+    }
+    
+    // 模拟当前预约数据，设置15分钟后到期
+    const now = new Date()
+    const endTime = new Date(now.getTime() + 15 * 60 * 1000) // 15分钟后
+    
+    // 格式化当前时间
+    const formatTime = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      return `${year}-${month}-${day} ${hours}:${minutes}`
+    }
+    
     const mockBooking = {
       id: 1,
       buildingName: '东区1号楼',
       washerName: '洗衣机3',
-      bookingTime: '2024-01-15 14:30',
+      bookingTime: formatTime(now),
       status: 'pending',
       statusText: '预约中',
-      remainingTime: '还有15分钟'
+      remainingTime: '还有15分钟',
+      endTime: endTime.getTime()
     }
     
     this.setData({ currentBooking: mockBooking })
   },
 
+  // 开始倒计时
+  startCountdown() {
+    this.stopCountdown() // 先清除之前的定时器
+    
+    if (!this.data.currentBooking || !this.data.currentBooking.endTime) {
+      return
+    }
+    
+    const updateCountdown = () => {
+      const now = Date.now()
+      const endTime = this.data.currentBooking.endTime
+      const remaining = Math.max(0, endTime - now)
+      
+      if (remaining <= 0) {
+        // 倒计时结束
+        this.setData({
+          currentBooking: null
+        })
+        this.stopCountdown()
+        return
+      }
+      
+      // 计算剩余分钟
+      const minutes = Math.floor(remaining / 60000)
+      const seconds = Math.floor((remaining % 60000) / 1000)
+      
+      const remainingTime = `还有${minutes}分${seconds}秒`
+      
+      // 更新倒计时
+      this.setData({
+        'currentBooking.remainingTime': remainingTime
+      })
+    }
+    
+    // 立即更新一次
+    updateCountdown()
+    
+    // 每秒更新一次
+    const timer = setInterval(updateCountdown, 1000)
+    this.setData({ countdownTimer: timer })
+  },
+
+  // 停止倒计时
+  stopCountdown() {
+    if (this.data.countdownTimer) {
+      clearInterval(this.data.countdownTimer)
+      this.setData({ countdownTimer: null })
+    }
+  },
+
   // 加载推荐信息
   loadRecommendations() {
-    const recommendations = [
-      {
+    const now = new Date()
+    const currentHour = now.getHours()
+    
+    // 动态生成推荐时段
+    const recommendations = []
+    
+    // 推荐1: 当前时间后2小时
+    const rec1Hour = currentHour + 2
+    if (rec1Hour < 22) {
+      const endHour = rec1Hour + 1
+      recommendations.push({
         id: 1,
-        time: '14:00-15:00',
+        time: `${String(rec1Hour).padStart(2, '0')}:00-${String(endHour).padStart(2, '0')}:00`,
         date: '今天',
+        dateValue: now.toISOString().split('T')[0],
+        hour: rec1Hour,
         score: 85,
         description: '当前时段使用率较低，推荐预约'
-      },
-      {
+      })
+    }
+    
+    // 推荐2: 今天晚上黄金时段
+    if (currentHour < 20) {
+      recommendations.push({
         id: 2,
         time: '20:00-21:00',
         date: '今天',
+        dateValue: now.toISOString().split('T')[0],
+        hour: 20,
         score: 92,
         description: '晚间高峰时段，建议提前预约'
-      },
-      {
-        id: 3,
-        time: '10:00-11:00',
-        date: '明天',
-        score: 78,
-        description: '上午时段，使用率适中'
-      }
-    ]
+      })
+    }
+    
+    // 推荐3: 明天上午
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    recommendations.push({
+      id: 3,
+      time: '10:00-11:00',
+      date: `${tomorrow.getMonth() + 1}/${tomorrow.getDate()}`,
+      dateValue: tomorrow.toISOString().split('T')[0],
+      hour: 10,
+      score: 78,
+      description: '上午时段，使用率适中'
+    })
     
     this.setData({ recommendations })
   },
 
   // 加载预约历史
   loadBookingHistory() {
-    const history = [
-      {
-        id: 1,
-        bookingTime: '2024-01-14 16:30',
-        buildingName: '东区1号楼',
-        washerName: '洗衣机5',
-        status: 'completed',
-        statusText: '已完成'
-      },
-      {
-        id: 2,
-        bookingTime: '2024-01-13 20:00',
-        buildingName: '东区2号楼',
-        washerName: '洗衣机2',
-        status: 'completed',
-        statusText: '已完成'
-      },
-      {
-        id: 3,
-        bookingTime: '2024-01-12 14:00',
-        buildingName: '西区1号楼',
-        washerName: '洗衣机8',
-        status: 'cancelled',
-        statusText: '已取消'
-      }
-    ]
+    // 生成基于当前时间的最近预约历史
+    const now = new Date()
+    const history = []
+    
+    const formatTime = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      return `${year}-${month}-${day} ${hours}:${minutes}`
+    }
+    
+    // 2小时前
+    const time1 = new Date(now.getTime() - 2 * 60 * 60 * 1000)
+    history.push({
+      id: 1,
+      bookingTime: formatTime(time1),
+      buildingName: '东区1号楼',
+      washerName: '洗衣机5',
+      status: 'completed',
+      statusText: '已完成'
+    })
+    
+    // 1天前
+    const time2 = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    history.push({
+      id: 2,
+      bookingTime: formatTime(time2),
+      buildingName: '东区2号楼',
+      washerName: '洗衣机2',
+      status: 'completed',
+      statusText: '已完成'
+    })
+    
+    // 3天前
+    const time3 = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
+    history.push({
+      id: 3,
+      bookingTime: formatTime(time3),
+      buildingName: '西区1号楼',
+      washerName: '洗衣机8',
+      status: 'cancelled',
+      statusText: '已取消'
+    })
     
     this.setData({ bookingHistory: history })
   },
@@ -209,11 +338,30 @@ Page({
     const slots = []
     const startHour = 8
     const endHour = 22
+    const now = new Date()
+    const selectedDate = this.data.selectedDate || this.data.availableDates[0]
+    const isToday = selectedDate.date === now.toISOString().split('T')[0]
     
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-        const available = Math.random() > 0.3 // 模拟70%可用率
+        
+        // 如果是今天，过滤掉过去的时间
+        let available = true
+        if (isToday) {
+          const currentMinutes = now.getHours() * 60 + now.getMinutes()
+          const slotMinutes = hour * 60 + minute
+          if (slotMinutes <= currentMinutes) {
+            available = false
+          }
+        }
+        
+        // 70%的时段可用，确保有足够选择
+        if (available && Math.random() > 0.3) {
+          available = true
+        } else if (available) {
+          available = false
+        }
         
         slots.push({
           id: `${hour}-${minute}`,
@@ -263,7 +411,13 @@ Page({
       }
     ]
     
-    this.setData({ availableWashers: washers })
+    // 计算空闲洗衣机数量
+    const idleCount = washers.filter(w => w.status === 'idle').length
+    
+    this.setData({ 
+      availableWashers: washers,
+      availableWasherCount: idleCount
+    })
   },
 
   // 选择日期
@@ -363,7 +517,27 @@ Page({
       content: `确定预约${recommendation.time}时段吗？`,
       success: (res) => {
         if (res.confirm) {
-          this.confirmTimeBooking()
+          // 从推荐中解析时间段
+          const times = recommendation.time.split('-')
+          const [startHour, startMinute] = times[0].split(':')
+          
+          // 创建或查找对应的日期
+          const targetDate = this.data.availableDates.find(d => d.date === recommendation.dateValue) || this.data.availableDates[0]
+          
+          // 创建一个时间段对象
+          const timeSlot = {
+            id: `${startHour}-${startMinute}`,
+            time: recommendation.time,
+            available: true
+          }
+          
+          // 设置选择的时间段并直接预约
+          this.setData({ 
+            selectedTimeSlot: timeSlot,
+            selectedDate: targetDate
+          }, () => {
+            this.confirmTimeBooking()
+          })
         }
       }
     })
@@ -380,6 +554,8 @@ Page({
           
           setTimeout(() => {
             wx.hideLoading()
+            // 保存取消状态到本地存储
+            wx.setStorageSync('cancelledBookingId', this.data.currentBooking.id)
             this.setData({ currentBooking: null })
             
             wx.showToast({

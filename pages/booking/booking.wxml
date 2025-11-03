@@ -44,7 +44,7 @@
       <view class="option-item" bindtap="quickBook" data-type="immediate">
         <view class="option-icon immediate">⚡</view>
         <text class="option-text">立即预约</text>
-        <text class="option-desc">选择空闲洗衣机</text>
+        <text class="option-desc">{{availableWasherCount}}台可用</text>
       </view>
       <view class="option-item" bindtap="quickBook" data-type="schedule">
         <view class="option-icon schedule">📅</view>
@@ -179,7 +179,7 @@
     </view>
     
     <view class="modal-body">
-      <view class="washer-list">
+      <view class="washer-list" wx:if="{{availableWashers.length > 0}}">
         <view class="washer-item {{washer.status === 'idle' ? 'available' : 'unavailable'}}"
               wx:for="{{availableWashers}}" 
               wx:key="id" 
@@ -194,6 +194,10 @@
             <text class="washer-distance" wx:if="{{washer.distance}}">距离{{washer.distance}}m</text>
           </view>
         </view>
+      </view>
+      <view class="empty-state" wx:else>
+        <view class="empty-icon">🧺</view>
+        <text class="empty-text">暂时没有可用的洗衣机</text>
       </view>
     </view>
     

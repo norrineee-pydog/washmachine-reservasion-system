@@ -1,18 +1,8 @@
 // pages/booking-detail/booking-detail.js
 Page({
   data: {
-    booking: {
-      id: 1,
-      bookingId: 'BK20240115001',
-      buildingName: '东区1号楼',
-      washerName: '洗衣机3',
-      bookingTime: '2024-01-15 14:30',
-      status: 'pending',
-      statusText: '预约中',
-      statusDesc: '等待设备就绪',
-      statusIcon: '⏰',
-      remainingTime: '还有15分钟'
-    }
+    booking: null,
+    countdownTimer: null
   },
 
   onLoad(options) {
@@ -20,23 +10,101 @@ Page({
     this.loadBookingDetail(options.id)
   },
 
+  onShow() {
+    if (this.data.booking) {
+      this.startCountdown()
+    }
+  },
+
+  onHide() {
+    this.stopCountdown()
+  },
+
+  onUnload() {
+    this.stopCountdown()
+  },
+
   // 加载预约详情
   loadBookingDetail(id) {
+    // 生成动态时间
+    const now = new Date()
+    const formattedTime = this.formatTime(now)
+    const bookingId = `BK${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}001`
+    
     // 模拟数据
     const mockBooking = {
       id: id || 1,
-      bookingId: 'BK20240115001',
+      bookingId: bookingId,
       buildingName: '东区1号楼',
       washerName: '洗衣机3',
-      bookingTime: '2024-01-15 14:30',
+      bookingTime: formattedTime,
       status: 'pending',
       statusText: '预约中',
       statusDesc: '等待设备就绪',
       statusIcon: '⏰',
-      remainingTime: '还有15分钟'
+      remainingTime: '还有15分钟',
+      endTime: now.getTime() + 15 * 60 * 1000
     }
     
     this.setData({ booking: mockBooking })
+    this.startCountdown()
+  },
+
+  // 格式化时间
+  formatTime(date) {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hours}:${minutes}`
+  },
+
+  // 开始倒计时
+  startCountdown() {
+    this.stopCountdown()
+    
+    if (!this.data.booking || !this.data.booking.endTime) {
+      return
+    }
+    
+    const updateCountdown = () => {
+      const now = Date.now()
+      const endTime = this.data.booking.endTime
+      const remaining = Math.max(0, endTime - now)
+      
+      if (remaining <= 0) {
+        this.setData({
+          'booking.status': 'expired',
+          'booking.statusText': '已过期',
+          'booking.statusDesc': '预约已过期',
+          'booking.statusIcon': '❌',
+          'booking.remainingTime': '已过期'
+        })
+        this.stopCountdown()
+        return
+      }
+      
+      const minutes = Math.floor(remaining / 60000)
+      const seconds = Math.floor((remaining % 60000) / 1000)
+      const remainingTime = `还有${minutes}分${seconds}秒`
+      
+      this.setData({
+        'booking.remainingTime': remainingTime
+      })
+    }
+    
+    updateCountdown()
+    const timer = setInterval(updateCountdown, 1000)
+    this.setData({ countdownTimer: timer })
+  },
+
+  // 停止倒计时
+  stopCountdown() {
+    if (this.data.countdownTimer) {
+      clearInterval(this.data.countdownTimer)
+      this.setData({ countdownTimer: null })
+    }
   },
 
   // 取消预约

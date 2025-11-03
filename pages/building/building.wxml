@@ -61,14 +61,10 @@
   <view class="all-buildings-section">
     <view class="section-header">
       <text class="section-title">所有楼栋</text>
-      <view class="view-mode">
-        <view class="mode-btn {{viewMode === 'list' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="list">列表</view>
-        <view class="mode-btn {{viewMode === 'map' ? 'active' : ''}}" bindtap="switchViewMode" data-mode="map">地图</view>
-      </view>
     </view>
 
     <!-- 列表模式 -->
-    <view class="building-list" wx:if="{{viewMode === 'list'}}">
+    <view class="building-list">
       <view class="building-card" wx:for="{{filteredBuildings}}" wx:key="id" bindtap="selectBuilding" data-building="{{item}}">
         <view class="building-info">
           <view class="building-name">{{item.name}}</view>
@@ -99,26 +95,6 @@
           </view>
         </view>
       </view>
-    </view>
-
-    <!-- 地图模式 -->
-    <view class="building-map" wx:if="{{viewMode === 'map'}}">
-      <map 
-        id="buildingMap" 
-        class="map-container"
-        longitude="{{mapCenter.longitude}}"
-        latitude="{{mapCenter.latitude}}"
-        scale="{{mapScale}}"
-        markers="{{mapMarkers}}"
-        bindmarkertap="onMarkerTap"
-        bindregionchange="onRegionChange"
-      >
-        <cover-view class="map-controls">
-          <cover-view class="control-btn" bindtap="centerToCurrent">📍</cover-view>
-          <cover-view class="control-btn" bindtap="zoomIn">+</cover-view>
-          <cover-view class="control-btn" bindtap="zoomOut">-</cover-view>
-        </cover-view>
-      </map>
     </view>
   </view>
 

@@ -8,13 +8,6 @@ Page({
     favoriteBuildings: [],
     allBuildings: [],
     filteredBuildings: [],
-    viewMode: 'list', // list 或 map
-    mapCenter: {
-      longitude: 121.5000,
-      latitude: 31.2756
-    },
-    mapScale: 16,
-    mapMarkers: [],
     showDetailModal: false,
     selectedBuilding: null
   },
@@ -51,7 +44,6 @@ Page({
       allBuildings: mockBuildings,
       filteredBuildings: mockBuildings
     })
-    this.updateMapMarkers()
   },
 
   // 获取模拟楼栋数据
@@ -154,30 +146,6 @@ Page({
     this.setData({ favoriteBuildings: favorites })
   },
 
-  // 更新地图标记
-  updateMapMarkers() {
-    const markers = this.data.allBuildings.map(building => ({
-      id: building.id,
-      latitude: building.latitude,
-      longitude: building.longitude,
-      title: building.name,
-      iconPath: '/images/marker.png',
-      width: 30,
-      height: 30,
-      callout: {
-        content: `${building.name}\n空闲: ${building.idleCount}台`,
-        color: '#333',
-        fontSize: 12,
-        borderRadius: 8,
-        bgColor: '#fff',
-        padding: 8,
-        display: 'BYCLICK'
-      }
-    }))
-    
-    this.setData({ mapMarkers: markers })
-  },
-
   // 搜索输入
   onSearchInput(e) {
     const keyword = e.detail.value
@@ -203,12 +171,6 @@ Page({
     }
     
     this.setData({ filteredBuildings: filtered })
-  },
-
-  // 切换视图模式
-  switchViewMode(e) {
-    const mode = e.currentTarget.dataset.mode
-    this.setData({ viewMode: mode })
   },
 
   // 选择楼栋
@@ -323,52 +285,6 @@ Page({
           icon: 'none'
         })
       }
-    })
-  },
-
-  // 地图标记点击
-  onMarkerTap(e) {
-    const markerId = e.detail.markerId
-    const building = this.data.allBuildings.find(b => b.id === markerId)
-    if (building) {
-      this.selectBuilding({ currentTarget: { dataset: { building } } })
-    }
-  },
-
-  // 地图区域变化
-  onRegionChange(e) {
-    if (e.type === 'end') {
-      this.setData({
-        mapCenter: {
-          longitude: e.detail.longitude,
-          latitude: e.detail.latitude
-        },
-        mapScale: e.detail.scale
-      })
-    }
-  },
-
-  // 地图控制
-  centerToCurrent() {
-    if (this.data.currentBuilding) {
-      this.setData({
-        mapCenter: {
-          longitude: this.data.currentBuilding.longitude,
-          latitude: this.data.currentBuilding.latitude
-        }
-      })
-    }
-  },
-
-  zoomIn() {
-    this.setData({
-      mapScale: Math.min(this.data.mapScale + 1, 20)
-    })
-  },
-
-  zoomOut() {
-    this.setData({
-      mapScale: Math.max(this.data.mapScale - 1, 5)
     })
   },
 

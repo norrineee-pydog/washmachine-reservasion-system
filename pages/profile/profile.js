@@ -73,10 +73,19 @@ Page({
 
   // 加载徽章数量
   loadBadgeCounts() {
-    // 模拟数据
+    // 从本地存储读取已读消息ID列表
+    const readMessages = wx.getStorageSync('readMessages') || []
+    const cancelledBookingId = wx.getStorageSync('cancelledBookingId')
+    
+    // 当前预约数量（如果未被取消则为1）
+    const bookingCount = (cancelledBookingId === 1) ? 0 : 1
+    
+    // 未读消息数量（假设总共有1条未读消息）
+    const messageCount = readMessages.includes(1) ? 0 : 1
+    
     this.setData({
-      bookingCount: 1,
-      messageCount: 3
+      bookingCount,
+      messageCount
     })
   },
 

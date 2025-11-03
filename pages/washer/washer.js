@@ -110,8 +110,33 @@ Page({
       wx.showToast({ title: '该设备不可预约', icon: 'none' })
       return
     }
-    wx.navigateTo({
-      url: `/pages/booking/booking?washerId=${washer.id}&washerName=${washer.name}`
+    wx.showModal({
+      title: '确认预约',
+      content: `确定预约${washer.name}吗？`,
+      success: (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '预约中...' })
+          
+          setTimeout(() => {
+            wx.hideLoading()
+            wx.showToast({
+              title: '预约成功',
+              icon: 'success'
+            })
+            
+            // 更新设备状态为预约中
+            const washers = this.data.washers.map(w => {
+              if (w.id === washer.id) {
+                return { ...w, status: 'booking', statusText: '预约中', remainingTime: '约15分钟后可用' }
+              }
+              return w
+            })
+            const summary = this.calcSummary(washers)
+            this.setData({ washers, summary })
+            this.applyFilterAndSort()
+          }, 1000)
+        }
+      }
     })
   }
 })

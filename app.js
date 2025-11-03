@@ -33,6 +33,16 @@ App({
 
   // 初始化位置服务
   initLocation() {
+    // 先设置默认楼栋，避免定位失败时显示"正在定位..."
+    this.globalData.currentBuilding = {
+      id: 1,
+      name: '东区1号楼',
+      floors: 6,
+      washerCount: 12,
+      idleCount: 8,
+      workingCount: 4
+    }
+    
     wx.getLocation({
       type: 'gcj02',
       success: (res) => {
@@ -41,12 +51,7 @@ App({
       },
       fail: (err) => {
         console.log('获取位置失败', err)
-        // 使用默认楼栋
-        this.globalData.currentBuilding = {
-          id: 1,
-          name: '东区1号楼',
-          floors: 6
-        }
+        // 使用默认楼栋已在上面设置
       }
     })
   },
@@ -56,9 +61,9 @@ App({
     // 这里应该调用后端API根据经纬度获取楼栋信息
     // 暂时使用模拟数据
     const buildings = [
-      { id: 1, name: '东区1号楼', lat: 31.2756, lng: 121.5000, floors: 6 },
-      { id: 2, name: '东区2号楼', lat: 31.2758, lng: 121.5002, floors: 6 },
-      { id: 3, name: '西区1号楼', lat: 31.2750, lng: 121.4998, floors: 8 }
+      { id: 1, name: '东区1号楼', lat: 31.2756, lng: 121.5000, floors: 6, washerCount: 12, idleCount: 8, workingCount: 4 },
+      { id: 2, name: '东区2号楼', lat: 31.2758, lng: 121.5002, floors: 6, washerCount: 12, idleCount: 6, workingCount: 6 },
+      { id: 3, name: '西区1号楼', lat: 31.2750, lng: 121.4998, floors: 8, washerCount: 16, idleCount: 10, workingCount: 6 }
     ]
     
     // 简单的距离计算找到最近的楼栋

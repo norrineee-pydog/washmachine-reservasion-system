@@ -46,7 +46,7 @@
       </view>
       <view class="contact-item" bindtap="sendEmail">
         <view class="contact-icon">📧</view>
-        <text class="contact-text">邮箱：service@shu.edu.cn</text>
+        <text class="contact-text">邮箱：fate1238@shu.edu.cn</text>
       </view>
       <view class="contact-item" bindtap="openWechat">
         <view class="contact-icon">💬</view>
