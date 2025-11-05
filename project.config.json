@@ -47,8 +47,8 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "2.19.4",
-  "appid": "wxca3a90114bd7afde",
+  "libVersion": "3.11.1",
+  "appid": "wx5726e4c3725e558c",
   "projectname": "上大洗衣侠",
   "condition": {},
   "editorSetting": {

@@ -13,7 +13,20 @@ App({
     this.checkLoginStatus()
     this.initLocation()
   },
-
+// 初始化云开发
+initCloudDevelopment() {
+  if (!wx.cloud) {
+    console.error('请使用 2.2.3 或以上的基础库以使用云能力')
+    return
+  }
+  
+  wx.cloud.init({
+    env: 'cloud1-5ggq2l2i9a7c56ed', // 你的环境ID
+    traceUser: true,
+  })
+  
+  console.log('云开发初始化完成')
+},
   onShow() {
     console.log('小程序显示')
   },

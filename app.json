@@ -11,6 +11,14 @@
     "pages/credit/credit",
     "pages/help/help"
   ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序定位楼栋"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#4A90E2",

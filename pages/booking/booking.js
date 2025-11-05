@@ -108,54 +108,57 @@ Page({
   },
 
   // 开始倒计时
-  startCountdown() {
-    this.stopCountdown() // 先清除之前的定时器
+startCountdown() {
+  this.stopCountdown() // 先清除之前的定时器
+  
+  if (!this.data.currentBooking || !this.data.currentBooking.endTime) {
+    return
+  }
+  
+  const updateCountdown = () => {
+    const now = Date.now()
+    const endTime = this.data.currentBooking.endTime
+    if (!endTime) {  // 添加额外的空值检查
+      return;
+    }
+    const remaining = Math.max(0, endTime - now)
     
-    if (!this.data.currentBooking || !this.data.currentBooking.endTime) {
+    if (remaining <= 0) {
+      // 倒计时结束
+      this.setData({
+        currentBooking: null
+      })
+      this.stopCountdown()
       return
     }
     
-    const updateCountdown = () => {
-      const now = Date.now()
-      const endTime = this.data.currentBooking.endTime
-      const remaining = Math.max(0, endTime - now)
-      
-      if (remaining <= 0) {
-        // 倒计时结束
-        this.setData({
-          currentBooking: null
-        })
-        this.stopCountdown()
-        return
-      }
-      
-      // 计算剩余分钟
-      const minutes = Math.floor(remaining / 60000)
-      const seconds = Math.floor((remaining % 60000) / 1000)
-      
-      const remainingTime = `还有${minutes}分${seconds}秒`
-      
-      // 更新倒计时
-      this.setData({
-        'currentBooking.remainingTime': remainingTime
-      })
-    }
+    // 计算剩余分钟
+    const minutes = Math.floor(remaining / 60000)
+    const seconds = Math.floor((remaining % 60000) / 1000)
     
-    // 立即更新一次
-    updateCountdown()
+    const remainingTime = `还有${minutes}分${seconds}秒`
     
-    // 每秒更新一次
-    const timer = setInterval(updateCountdown, 1000)
-    this.setData({ countdownTimer: timer })
-  },
+    // 更新倒计时
+    this.setData({
+      'currentBooking.remainingTime': remainingTime
+    })
+  }
+  
+  // 立即更新一次
+  updateCountdown()
+  
+  // 每秒更新一次
+  const timer = setInterval(updateCountdown, 1000)
+  this.setData({ countdownTimer: timer })
+},
 
-  // 停止倒计时
-  stopCountdown() {
-    if (this.data.countdownTimer) {
-      clearInterval(this.data.countdownTimer)
-      this.setData({ countdownTimer: null })
-    }
-  },
+// 停止倒计时
+stopCountdown() {
+  if (this.data.countdownTimer) {
+    clearInterval(this.data.countdownTimer)
+    this.setData({ countdownTimer: null })
+  }
+},
 
   // 加载推荐信息
   loadRecommendations() {
@@ -428,12 +431,12 @@ Page({
   },
 
   // 选择时间段
-  selectTimeSlot(e) {
-    const slot = e.currentTarget.dataset.slot
-    if (slot.available) {
-      this.setData({ selectedTimeSlot: slot })
-    }
-  },
+selectTimeSlot(e) {
+  const slot = e.currentTarget.dataset.slot;
+  if (slot && slot.available) {
+    this.setData({ selectedTimeSlot: slot });
+  }
+},
 
   // 选择洗衣机
   selectWasher(e) {

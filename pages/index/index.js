@@ -64,22 +64,98 @@ Page({
     })
   },
 
-  // 加载洗衣机状态
+  // 加载洗衣机状态 - 修改为从云数据库获取
   loadWasherStatus() {
     this.setData({ loading: true })
     
-    // 模拟API调用
-    setTimeout(() => {
-      const mockData = this.getMockWasherData()
-      this.setData({
-        washerList: mockData,
-        statusSummary: this.calculateStatusSummary(mockData),
-        loading: false
+    const db = wx.cloud.database()
+    
+    // 查询当前楼栋的洗衣机
+    db.collection('washing_machines')
+      .where({
+        building: this.data.currentBuilding ? this.data.currentBuilding.name : '东区1号楼'
       })
-    }, 1000)
+      .get()
+      .then(res => {
+        console.log('获取洗衣机数据成功:', res.data)
+        
+        const washerList = res.data.map(machine => {
+          // 转换数据库字段为前端需要的格式
+          return {
+            id: machine._id,
+            name: machine.machineName || machine.name,
+            location: machine.machineLocation || machine.location,
+            status: this.mapStatus(machine.status),
+            statusText: this.getStatusText(machine.status),
+            remainingTime: this.getRemainingTime(machine.status, machine.endTime),
+            machineData: machine // 保留原始数据
+          }
+        })
+        
+        this.setData({
+          washerList: washerList,
+          statusSummary: this.calculateStatusSummary(washerList),
+          loading: false
+        })
+      })
+      .catch(err => {
+        console.error('获取洗衣机数据失败:', err)
+        // 失败时使用模拟数据
+        this.fallbackToMockData()
+      })
   },
 
-  // 获取模拟洗衣机数据
+  // 映射状态到前端状态
+  mapStatus(dbStatus) {
+    const statusMap = {
+      'available': 'idle',
+      'reserved': 'booking', 
+      'in_use': 'working',
+      'completed': 'ready',
+      'maintenance': 'fault'
+    }
+    return statusMap[dbStatus] || 'idle'
+  },
+
+  // 获取状态文本
+  getStatusText(dbStatus) {
+    const statusTextMap = {
+      'available': '空闲',
+      'reserved': '预约中',
+      'in_use': '工作中',
+      'completed': '待取衣',
+      'maintenance': '故障'
+    }
+    return statusTextMap[dbStatus] || '空闲'
+  },
+
+  // 获取剩余时间
+  getRemainingTime(status, endTime) {
+    if (status === 'reserved') {
+      return '15分钟后可用'
+    } else if (status === 'in_use' && endTime) {
+      // 计算剩余时间
+      const now = new Date()
+      const end = new Date(endTime)
+      const diff = Math.max(0, Math.floor((end - now) / (1000 * 60))) // 分钟
+      return `${diff}分钟`
+    } else if (status === 'completed') {
+      return '已完成'
+    }
+    return null
+  },
+
+  // 备用模拟数据
+  fallbackToMockData() {
+    const mockData = this.getMockWasherData()
+    this.setData({
+      washerList: mockData,
+      statusSummary: this.calculateStatusSummary(mockData),
+      loading: false
+    })
+  },
+
+  // 获取模拟洗衣机数据（备用）
   getMockWasherData() {
     const statuses = ['idle', 'booking', 'working', 'ready', 'fault']
     const statusTexts = {
@@ -105,20 +181,6 @@ Page({
     }
     
     return washers
-  },
-
-  // 获取剩余时间
-  getRemainingTime(status) {
-    switch (status) {
-      case 'booking':
-        return '15分钟后可用'
-      case 'working':
-        return `${Math.floor(Math.random() * 30) + 10}分钟`
-      case 'ready':
-        return '已完成'
-      default:
-        return null
-    }
   },
 
   // 计算状态汇总
