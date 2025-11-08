@@ -1,0 +1,10 @@
+{
+  "name": "updateReservationStatus",
+  "version": "1.0.0",
+  "description": "更新預約付款與狀態資訊",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
+

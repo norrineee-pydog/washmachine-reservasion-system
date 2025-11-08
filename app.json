@@ -8,6 +8,7 @@
     "pages/profile/profile",
     "pages/booking-detail/booking-detail",
     "pages/message/message",
+    "pages/my-booking/my-booking", 
     "pages/credit/credit",
     "pages/help/help"
   ],

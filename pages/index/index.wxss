@@ -1,302 +1,277 @@
 /* pages/index/index.wxss */
-
-/* 欢迎区域 */
-.welcome-section {
-  margin-bottom: 30rpx;
+.container {
+  min-height: 100vh;
+  background: #f5f5f5; /* 改为和其他页面一样的浅灰色背景 */
+  padding: 20rpx;
 }
 
-.welcome-card {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
-  border-radius: 20rpx;
-  padding: 40rpx;
-  color: #fff;
+/* 状态栏 */
+.status-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 8rpx 24rpx rgba(74, 144, 226, 0.3);
-}
-
-.welcome-content {
-  flex: 1;
-}
-
-.welcome-title {
-  display: block;
-  font-size: 36rpx;
-  font-weight: 600;
-  margin-bottom: 10rpx;
-}
-
-.welcome-subtitle {
-  display: block;
-  font-size: 28rpx;
-  opacity: 0.9;
-  margin-bottom: 15rpx;
+  margin-bottom: 30rpx;
 }
 
 .weather-info {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 20rpx;
-  padding: 8rpx 16rpx;
-  display: inline-block;
-}
-
-.weather-text {
-  font-size: 24rpx;
-}
-
-.welcome-avatar {
-  width: 100rpx;
-  height: 100rpx;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 4rpx solid rgba(255, 255, 255, 0.3);
-}
-
-.avatar-img {
-  width: 100%;
-  height: 100%;
-}
-
-/* 快速操作区域 */
-.quick-actions {
-  display: flex;
-  justify-content: space-around;
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 40rpx 20rpx;
-  margin-bottom: 30rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
-}
-
-.action-item {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  flex: 1;
 }
 
-.action-icon {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
+.weather-temp {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333; /* 改为深色文字 */
+}
+
+.weather-desc {
+  font-size: 24rpx;
+  color: #666; /* 改为深色文字 */
+}
+
+.user-info {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40rpx;
-  margin-bottom: 15rpx;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.building-icon {
-  background: linear-gradient(135deg, #52C41A 0%, #389E0D 100%);
-}
-
-.booking-icon {
-  background: linear-gradient(135deg, #FAAD14 0%, #D48806 100%);
-}
-
-.message-icon {
-  background: linear-gradient(135deg, #FF4D4F 0%, #CF1322 100%);
-}
-
-.profile-icon {
-  background: linear-gradient(135deg, #722ED1 0%, #531DAB 100%);
-}
-
-.action-text {
-  font-size: 26rpx;
-  color: #333;
+.user-name {
+  font-size: 28rpx;
+  color: #333; /* 改为深色文字 */
   font-weight: 500;
 }
 
-/* 洗衣机状态区域 */
-.washer-status-section {
-  background: #fff;
+.user-building {
+  font-size: 22rpx;
+  color: #666; /* 改为深色文字 */
+}
+
+/* 状态概览 */
+.status-overview {
+  margin-bottom: 30rpx;
+}
+
+.overview-card {
+  background: white;
   border-radius: 20rpx;
   padding: 30rpx;
-  margin-bottom: 30rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30rpx;
-}
-
-.section-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #333;
-}
-
-.refresh-btn {
-  font-size: 26rpx;
-  color: #4A90E2;
-  padding: 10rpx 20rpx;
-  border-radius: 20rpx;
-  background: #f0f7ff;
-}
-
-/* 状态汇总 */
-.status-summary {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 30rpx;
-  padding: 20rpx;
-  background: #f8f9fa;
-  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
 }
 
-.status-item {
+.overview-item {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.status-count {
+.overview-count {
   font-size: 36rpx;
-  font-weight: 600;
-  margin-bottom: 8rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
 }
 
-.status-count.idle {
-  color: #52C41A;
+.overview-count.idle {
+  color: #52c41a;
 }
 
-.status-count.booking {
-  color: #FAAD14;
+.overview-count.booking {
+  color: #1890ff;
 }
 
-.status-count.working {
-  color: #FF4D4F;
+.overview-count.working {
+  color: #fa8c16;
 }
 
-.status-count.ready {
-  color: #1890FF;
+.overview-count.ready {
+  color: #722ed1;
 }
 
-.status-label {
+.overview-label {
   font-size: 24rpx;
   color: #666;
 }
 
+/* 快速操作 */
+.quick-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.quick-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  border-radius: 20rpx;
+  padding: 20rpx 10rpx;
+  width: 22%;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.action-icon {
+  font-size: 48rpx;
+  margin-bottom: 10rpx;
+}
+
+.action-text {
+  font-size: 24rpx;
+  color: #000000;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* 分区样式 */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333; /* 改为深色文字 */
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+}
+
+.refresh-btn, .view-all {
+  font-size: 24rpx;
+  color: #1890ff; /* 改为蓝色文字 */
+  margin-left: 20rpx;
+}
+
 /* 洗衣机列表 */
+.washer-section {
+  margin-bottom: 30rpx;
+}
+
 .washer-list {
-  margin-top: 20rpx;
+  max-height: 600rpx;
 }
 
 .washer-item {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 25rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
 }
 
-.washer-item:last-child {
-  border-bottom: none;
+.washer-item.idle {
+  border-left: 8rpx solid #52c41a;
 }
 
-.washer-info {
-  flex: 1;
+.washer-item.booking {
+  border-left: 8rpx solid #1890ff;
+}
+
+.washer-item.working {
+  border-left: 8rpx solid #fa8c16;
+}
+
+.washer-item.ready {
+  border-left: 8rpx solid #722ed1;
+}
+
+.washer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
 }
 
 .washer-name {
-  font-size: 30rpx;
-  font-weight: 500;
+  font-size: 28rpx;
+  font-weight: bold;
   color: #333;
-  margin-bottom: 8rpx;
-}
-
-.washer-location {
-  font-size: 26rpx;
-  color: #999;
 }
 
 .washer-status {
-  margin-right: 20rpx;
-  text-align: center;
-}
-
-.status-tag {
-  display: inline-block;
   padding: 8rpx 16rpx;
   border-radius: 20rpx;
-  font-size: 24rpx;
-  font-weight: 500;
-  margin-bottom: 8rpx;
+  font-size: 20rpx;
 }
 
-.status-idle {
+.washer-status.idle {
   background: #f6ffed;
   color: #52c41a;
-  border: 1rpx solid #b7eb8f;
 }
 
-.status-booking {
-  background: #fff7e6;
-  color: #fa8c16;
-  border: 1rpx solid #ffd591;
-}
-
-.status-working {
-  background: #fff2f0;
-  color: #ff4d4f;
-  border: 1rpx solid #ffccc7;
-}
-
-.status-ready {
+.washer-status.booking {
   background: #e6f7ff;
   color: #1890ff;
-  border: 1rpx solid #91d5ff;
 }
 
-.status-detail {
+.washer-status.working {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.washer-status.ready {
+  background: #f9f0ff;
+  color: #722ed1;
+}
+
+.washer-details {
+  margin-bottom: 15rpx;
+}
+
+.washer-location, .washer-type {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 5rpx;
+}
+
+.washer-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.washer-price {
+  font-size: 24rpx;
+  color: #ff4d4f;
+  font-weight: 500;
+}
+
+.washer-remaining {
   font-size: 22rpx;
   color: #999;
 }
 
-.time-text {
-  font-weight: 500;
-}
-
-.washer-action {
-  width: 120rpx;
-}
-
-.action-btn {
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
-  color: #fff;
-  font-size: 24rpx;
-  padding: 12rpx 20rpx;
-  border-radius: 20rpx;
-  text-align: center;
-  font-weight: 500;
-}
-
-.action-btn.disabled {
-  background: #d9d9d9;
-  color: #999;
+.washer-action .action-arrow {
+  font-size: 36rpx;
+  color: #ccc;
 }
 
 /* 推荐区域 */
 .recommendation-section {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 30rpx;
   margin-bottom: 30rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
 .recommendation-list {
-  margin-top: 20rpx;
+  background: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
 }
 
 .recommendation-item {
   display: flex;
-  align-items: center;
-  padding: 20rpx 0;
+  padding: 30rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
 
@@ -305,47 +280,80 @@
 }
 
 .recommendation-time {
-  font-size: 30rpx;
-  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-right: 30rpx;
+  min-width: 120rpx;
+}
+
+.time-slot {
+  font-size: 26rpx;
+  font-weight: bold;
   color: #333;
-  width: 200rpx;
+  margin-bottom: 10rpx;
+}
+
+.time-date {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.recommendation-content {
+  flex: 1;
 }
 
 .recommendation-desc {
-  flex: 1;
-  font-size: 26rpx;
+  display: block;
+  font-size: 24rpx;
   color: #666;
-  margin: 0 20rpx;
+  margin-bottom: 15rpx;
 }
 
 .recommendation-score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.score-text {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.score-value {
   font-size: 24rpx;
-  color: #4A90E2;
-  font-weight: 500;
+  color: #ff4d4f;
+  font-weight: bold;
 }
 
 /* 公告区域 */
 .notice-section {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 30rpx;
   margin-bottom: 30rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
 .notice-list {
-  margin-top: 20rpx;
+  background: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 4rrpx 20rpx rgba(0, 0, 0, 0.1);
 }
 
 .notice-item {
   display: flex;
   align-items: center;
-  padding: 20rpx 0;
+  padding: 25rpx 30rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
 
 .notice-item:last-child {
   border-bottom: none;
+}
+
+.notice-icon {
+  font-size: 32rpx;
+  margin-right: 20rpx;
 }
 
 .notice-content {
@@ -354,52 +362,36 @@
 
 .notice-title {
   display: block;
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #333;
   margin-bottom: 8rpx;
 }
 
 .notice-time {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #999;
 }
 
 .notice-arrow {
-  color: #ccc;
-  font-size: 24rpx;
-}
-
-/* 加载状态 */
-.loading {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.loading-spinner {
-  width: 60rpx;
-  height: 60rpx;
-  border: 4rpx solid #f3f3f3;
-  border-top: 4rpx solid #4A90E2;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-text {
-  margin-top: 20rpx;
   font-size: 28rpx;
-  color: #666;
+  color: #ccc;
+}
+
+/* 加载和空状态 */
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 60rpx;
+  background: white;
+  border-radius: 20rpx;
+  color: #999;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 安全区域 */
+.safe-area {
+  height: env(safe-area-inset-bottom);
 }

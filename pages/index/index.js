@@ -15,7 +15,8 @@ Page({
     },
     recommendations: [],
     notices: [],
-    loading: false
+    loading: false,
+    hasData: false
   },
 
   onLoad() {
@@ -25,12 +26,35 @@ Page({
 
   onShow() {
     console.log('首页显示')
+    // 每次显示页面时检查楼栋是否更新
+    this.checkBuildingUpdate()
     this.refreshData()
   },
 
   onPullDownRefresh() {
-    this.refreshData()
-    wx.stopPullDownRefresh()
+    this.refreshData().then(() => {
+      wx.stopPullDownRefresh()
+    })
+  },
+
+  // 检查楼栋是否更新
+  checkBuildingUpdate() {
+    const currentBuilding = app.globalData.currentBuilding
+    const oldBuilding = this.data.currentBuilding
+    
+    // 如果楼栋发生变化，重新加载洗衣机数据
+    if (currentBuilding && (!oldBuilding || currentBuilding.id !== oldBuilding.id)) {
+      console.log('检测到楼栋切换，重新加载数据')
+      this.setData({
+        currentBuilding: currentBuilding
+      })
+      this.loadWasherStatus()
+    } else if (!this.data.currentBuilding && currentBuilding) {
+      // 如果之前没有楼栋信息，现在有了
+      this.setData({
+        currentBuilding: currentBuilding
+      })
+    }
   },
 
   // 初始化页面
@@ -47,15 +71,16 @@ Page({
   },
 
   // 刷新数据
-  refreshData() {
-    this.loadWasherStatus()
-    this.loadRecommendations()
-    this.loadNotices()
+  async refreshData() {
+    await Promise.all([
+      this.loadWasherStatus(),
+      this.loadRecommendations(),
+      this.loadNotices()
+    ])
   },
 
   // 加载天气信息
   loadWeather() {
-    // 模拟天气数据
     this.setData({
       weather: {
         temp: 22,
@@ -64,45 +89,101 @@ Page({
     })
   },
 
-  // 加载洗衣机状态 - 修改为从云数据库获取
-  loadWasherStatus() {
+  // 加载洗衣机状态 - 根据当前楼栋筛选
+  async loadWasherStatus() {
     this.setData({ loading: true })
     
-    const db = wx.cloud.database()
-    
-    // 查询当前楼栋的洗衣机
-    db.collection('washing_machines')
-      .where({
-        building: this.data.currentBuilding ? this.data.currentBuilding.name : '东区1号楼'
-      })
-      .get()
-      .then(res => {
-        console.log('获取洗衣机数据成功:', res.data)
-        
-        const washerList = res.data.map(machine => {
-          // 转换数据库字段为前端需要的格式
+    try {
+      const db = wx.cloud.database()
+      const currentBuilding = this.data.currentBuilding || app.globalData.currentBuilding
+      
+      // 获取所有洗衣机
+      const res = await db.collection('machines')
+        .get()
+      
+      console.log('获取洗衣机数据成功:', res.data)
+      
+      if (res.data.length > 0) {
+        let washerList = res.data.map(machine => {
           return {
             id: machine._id,
-            name: machine.machineName || machine.name,
-            location: machine.machineLocation || machine.location,
+            name: machine.name,
+            location: machine.location,
+            type: machine.type,
+            capacity: machine.capacity,
+            pricePerHour: machine.pricePerHour,
             status: this.mapStatus(machine.status),
             statusText: this.getStatusText(machine.status),
-            remainingTime: this.getRemainingTime(machine.status, machine.endTime),
-            machineData: machine // 保留原始数据
+            description: machine.description,
+            remainingTime: null,
+            building: machine.building || '一楼洗衣房' // 添加楼栋信息
           }
         })
+        
+        // 根据当前楼栋筛选洗衣机
+        if (currentBuilding && currentBuilding.name) {
+          washerList = washerList.filter(machine => 
+            machine.location.includes(currentBuilding.name) || 
+            (machine.building && machine.building.includes(currentBuilding.name))
+          )
+        }
+        
+        await this.updateWasherStatusWithReservations(washerList)
         
         this.setData({
           washerList: washerList,
           statusSummary: this.calculateStatusSummary(washerList),
-          loading: false
+          loading: false,
+          hasData: true
         })
-      })
-      .catch(err => {
-        console.error('获取洗衣机数据失败:', err)
-        // 失败时使用模拟数据
+      } else {
         this.fallbackToMockData()
+      }
+      
+    } catch (err) {
+      console.error('获取洗衣机数据失败:', err)
+      this.fallbackToMockData()
+    }
+  },
+
+  // 根据预约数据更新洗衣机状态
+  async updateWasherStatusWithReservations(washerList) {
+    try {
+      const db = wx.cloud.database()
+      const now = new Date()
+      
+      const res = await db.collection('reservations')
+        .where({
+          status: 'pending'
+        })
+        .get()
+      
+      washerList.forEach(washer => {
+        const machineReservations = res.data.filter(reservation => 
+          reservation.machineId === washer.id
+        )
+        
+        if (machineReservations.length > 0) {
+          washer.status = 'booking'
+          washer.statusText = '预约中'
+          
+          const nearestReservation = machineReservations[0]
+          if (nearestReservation.reservationDateTime) {
+            const reserveTime = new Date(nearestReservation.reservationDateTime)
+            const timeDiff = Math.floor((reserveTime - now) / (1000 * 60))
+            
+            if (timeDiff > 0) {
+              washer.remainingTime = `${timeDiff}分钟后开始`
+            } else {
+              washer.remainingTime = '即将开始'
+            }
+          }
+        }
       })
+      
+    } catch (error) {
+      console.error('获取预约数据失败:', error)
+    }
   },
 
   // 映射状态到前端状态
@@ -111,6 +192,7 @@ Page({
       'available': 'idle',
       'reserved': 'booking', 
       'in_use': 'working',
+      'pending': 'booking',
       'completed': 'ready',
       'maintenance': 'fault'
     }
@@ -123,64 +205,64 @@ Page({
       'available': '空闲',
       'reserved': '预约中',
       'in_use': '工作中',
+      'pending': '预约中',
       'completed': '待取衣',
       'maintenance': '故障'
     }
     return statusTextMap[dbStatus] || '空闲'
   },
 
-  // 获取剩余时间
-  getRemainingTime(status, endTime) {
-    if (status === 'reserved') {
-      return '15分钟后可用'
-    } else if (status === 'in_use' && endTime) {
-      // 计算剩余时间
-      const now = new Date()
-      const end = new Date(endTime)
-      const diff = Math.max(0, Math.floor((end - now) / (1000 * 60))) // 分钟
-      return `${diff}分钟`
-    } else if (status === 'completed') {
-      return '已完成'
-    }
-    return null
-  },
-
-  // 备用模拟数据
+  // 备用模拟数据 - 根据楼栋生成
   fallbackToMockData() {
-    const mockData = this.getMockWasherData()
+    const currentBuilding = this.data.currentBuilding || app.globalData.currentBuilding
+    const buildingName = currentBuilding ? currentBuilding.name : '一楼洗衣房'
+    
+    const mockData = [
+      {
+        id: 'machine_001',
+        name: '滚筒洗衣机A',
+        location: `${buildingName}A区`,
+        type: '滚筒',
+        capacity: '8kg',
+        pricePerHour: 5,
+        status: 'idle',
+        statusText: '空闲',
+        description: '大容量滚筒洗衣机，带烘干功能',
+        building: buildingName
+      },
+      {
+        id: 'machine_002',
+        name: '波轮洗衣机B',
+        location: `${buildingName}B区`,
+        type: '波轮',
+        capacity: '7kg',
+        pricePerHour: 4,
+        status: 'idle',
+        statusText: '空闲',
+        description: '节能波轮洗衣机',
+        building: buildingName
+      },
+      {
+        id: 'machine_003',
+        name: '滚筒洗衣机C',
+        location: `${buildingName}C区`,
+        type: '滚筒',
+        capacity: '10kg',
+        pricePerHour: 6,
+        status: 'working',
+        statusText: '工作中',
+        description: '超大容量滚筒洗衣机',
+        building: buildingName,
+        remainingTime: '25分钟'
+      }
+    ]
+    
     this.setData({
       washerList: mockData,
       statusSummary: this.calculateStatusSummary(mockData),
-      loading: false
+      loading: false,
+      hasData: true
     })
-  },
-
-  // 获取模拟洗衣机数据（备用）
-  getMockWasherData() {
-    const statuses = ['idle', 'booking', 'working', 'ready', 'fault']
-    const statusTexts = {
-      'idle': '空闲',
-      'booking': '预约中',
-      'working': '工作中',
-      'ready': '待取衣',
-      'fault': '故障'
-    }
-    
-    const washers = []
-    for (let i = 1; i <= 12; i++) {
-      const status = statuses[Math.floor(Math.random() * statuses.length)]
-      const washer = {
-        id: i,
-        name: `洗衣机${i}`,
-        location: `${Math.ceil(i / 2)}楼洗衣房`,
-        status: status,
-        statusText: statusTexts[status],
-        remainingTime: this.getRemainingTime(status)
-      }
-      washers.push(washer)
-    }
-    
-    return washers
   },
 
   // 计算状态汇总
@@ -222,23 +304,61 @@ Page({
   },
 
   // 加载公告信息
-  loadNotices() {
+  async loadNotices() {
+    try {
+      const db = wx.cloud.database()
+      const res = await db.collection('announcements')
+        .where({
+          status: 'active'
+        })
+        .orderBy('createTime', 'desc')
+        .limit(3)
+        .get()
+      
+      if (res.data.length > 0) {
+        const notices = res.data.map(notice => ({
+          id: notice._id,
+          title: notice.title,
+          time: this.formatDate(notice.createTime),
+          content: notice.content
+        }))
+        this.setData({ notices })
+      } else {
+        this.setDefaultNotices()
+      }
+    } catch (error) {
+      console.error('加载公告失败:', error)
+      this.setDefaultNotices()
+    }
+  },
+
+  // 设置默认公告
+  setDefaultNotices() {
     const notices = [
       {
         id: 1,
-        title: '系统维护通知',
+        title: '系统公告',
         time: '2024-01-15',
-        content: '系统将于今晚22:00-24:00进行维护升级'
+        content: '欢迎使用上大洗衣侠小程序'
       },
       {
         id: 2,
-        title: '新增功能上线',
+        title: '温馨提示',
         time: '2024-01-10',
-        content: '智能推荐功能已上线，为您推荐最佳洗衣时段'
+        content: '请及时取走已完成的衣物'
       }
     ]
-    
     this.setData({ notices })
+  },
+
+  // 格式化日期
+  formatDate(date) {
+    if (!date) return ''
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   },
 
   // 选择洗衣机
@@ -246,7 +366,7 @@ Page({
     const washer = e.currentTarget.dataset.washer
     if (washer.status === 'idle') {
       wx.navigateTo({
-        url: `/pages/booking/booking?washerId=${washer.id}&washerName=${washer.name}`
+        url: `/pages/booking/booking?washerId=${washer.id}&washerName=${washer.name}&type=${washer.type}&price=${washer.pricePerHour}`
       })
     } else {
       wx.showToast({
@@ -254,6 +374,63 @@ Page({
         icon: 'none'
       })
     }
+  },
+
+  // 立即预约 - 直接跳转到预约页面
+  goToImmediateBooking() {
+    console.log('点击立即预约')
+    wx.switchTab({
+      url: '/pages/booking/booking'
+    })
+  },
+
+  // 选择楼栋
+  goToBuilding() {
+    wx.switchTab({
+      url: '/pages/building/building'
+    })
+  },
+
+  // 跳转到我的预约
+goToMyBooking() {
+  console.log('跳转到我的预约页面')
+  
+  if (!this.data.userInfo) {
+    wx.showToast({
+      title: '请先登录',
+      icon: 'none'
+    })
+    return
+  }
+  
+  // 跳转到我的预约页面
+  wx.navigateTo({
+    url: '/pages/my-booking/my-booking',
+    success: () => {
+      console.log('跳转到我的预约页面成功')
+    },
+    fail: (err) => {
+      console.error('跳转失败:', err)
+      wx.showToast({
+        title: '跳转失败，请重试',
+        icon: 'none'
+      })
+    }
+  })
+},
+
+  // 消息中心
+  goToMessage() {
+    wx.navigateTo({
+      url: '/pages/message/message'
+    })
+  },
+
+  // 个人中心
+  goToProfile() {
+    wx.switchTab({
+      url: '/pages/profile/profile'
+    })
   },
 
   // 刷新状态
@@ -275,31 +452,10 @@ Page({
     })
   },
 
-  // 跳转到楼栋页面
-  goToBuilding() {
-    wx.switchTab({
-      url: '/pages/building/building'
-    })
-  },
-
   // 跳转到预约页面
   goToBooking() {
     wx.switchTab({
       url: '/pages/booking/booking'
-    })
-  },
-
-  // 跳转到消息页面
-  goToMessage() {
-    wx.navigateTo({
-      url: '/pages/message/message'
-    })
-  },
-
-  // 跳转到个人中心
-  goToProfile() {
-    wx.switchTab({
-      url: '/pages/profile/profile'
     })
   }
 })

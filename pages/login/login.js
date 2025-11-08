@@ -193,6 +193,25 @@ Page({
     setTimeout(() => {
       // 保存用户信息到全局
       app.login(userInfo)
+      wx.cloud.callFunction({
+        name: 'userProfile',
+        data: {
+          action: 'upsert',
+          profile: userInfo
+        }
+      }).then(res => {
+        if (res.result && res.result.success && res.result.data) {
+          const profile = res.result.data
+          app.globalData.userInfo = {
+            ...userInfo,
+            _id: profile._id,
+            creditScore: profile.creditScore
+          }
+          wx.setStorageSync('userInfo', app.globalData.userInfo)
+        }
+      }).catch(err => {
+        console.error('同步用户资料失败:', err)
+      })
       
       this.setData({ loading: false })
       

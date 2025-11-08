@@ -33,6 +33,26 @@
       <text class="detail-label">预约时间</text>
       <text class="detail-value">{{booking.bookingTime}}</text>
     </view>
+
+    <view class="detail-item">
+      <text class="detail-label">使用时段</text>
+      <text class="detail-value">{{booking.reservationTimeRange}}</text>
+    </view>
+
+    <view class="detail-item">
+      <text class="detail-label">洗衣时长</text>
+      <text class="detail-value">{{booking.duration}}分钟</text>
+    </view>
+
+    <view class="detail-item">
+      <text class="detail-label">洗衣机价格</text>
+      <text class="detail-value">￥{{booking.pricePerHour}}/小时</text>
+    </view>
+
+    <view class="detail-item">
+      <text class="detail-label">应付金额</text>
+      <text class="detail-value price-value">￥{{booking.totalPrice}}</text>
+    </view>
     
     <view class="detail-item">
       <text class="detail-label">预约编号</text>
@@ -42,8 +62,10 @@
 
   <!-- 操作按钮 -->
   <view class="action-buttons">
-    <button class="action-btn secondary" bindtap="cancelBooking" wx:if="{{booking.status === 'pending'}}">取消预约</button>
-    <button class="action-btn primary" bindtap="startWashing" wx:if="{{booking.status === 'ready'}}">开始洗衣</button>
+    <button class="action-btn secondary" bindtap="cancelBooking" wx:if="{{booking.status === 'pending' && booking.paymentStatus === 'unpaid'}}">取消预约</button>
+    <button class="action-btn primary" bindtap="simulatePayment" wx:if="{{booking.paymentStatus === 'unpaid'}}">模拟付款</button>
+    <button class="action-btn primary" bindtap="startWashing" wx:if="{{booking.status === 'confirmed'}}">开始洗衣</button>
     <button class="action-btn success" bindtap="completeWashing" wx:if="{{booking.status === 'working'}}">完成洗衣</button>
+    <text class="action-hint" wx:if="{{booking.status === 'completed'}}">该预约已完成</text>
   </view>
 </view>

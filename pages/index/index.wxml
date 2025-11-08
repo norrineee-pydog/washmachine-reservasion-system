@@ -1,125 +1,131 @@
 <!--pages/index/index.wxml-->
 <view class="container">
-  <!-- 顶部欢迎区域 -->
-  <view class="welcome-section">
-    <view class="welcome-card">
-      <view class="welcome-content">
-        <view class="welcome-text">
-          <text class="welcome-title">欢迎使用上大洗衣侠</text>
-          <text class="welcome-subtitle">{{currentBuilding ? currentBuilding.name : '正在定位...'}}</text>
-        </view>
-        <view class="weather-info" wx:if="{{weather}}">
-          <text class="weather-text">{{weather.temp}}°C {{weather.desc}}</text>
-        </view>
+  <!-- 顶部状态栏 -->
+  <view class="status-bar">
+    <view class="weather-info">
+      <text class="weather-temp">{{weather.temp}}°</text>
+      <text class="weather-desc">{{weather.desc}}</text>
+    </view>
+    <view class="user-info" bindtap="goToProfile">
+      <text class="user-name">{{userInfo ? userInfo.nickName : '请登录'}}</text>
+      <text class="user-building">{{currentBuilding ? currentBuilding.name : '选择楼栋'}}</text>
+    </view>
+  </view>
+
+  <!-- 删除搜索栏，直接显示洗衣机状态概览 -->
+  
+  <!-- 洗衣机状态概览 -->
+  <view class="status-overview">
+    <view class="overview-card">
+      <view class="overview-item">
+        <text class="overview-count {{statusSummary.idle > 0 ? 'idle' : ''}}">{{statusSummary.idle}}</text>
+        <text class="overview-label">空闲</text>
       </view>
-      <view class="welcome-avatar">
-        <image src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" class="avatar-img"></image>
+      <view class="overview-item">
+        <text class="overview-count {{statusSummary.booking > 0 ? 'booking' : ''}}">{{statusSummary.booking}}</text>
+        <text class="overview-label">预约中</text>
+      </view>
+      <view class="overview-item">
+        <text class="overview-count {{statusSummary.working > 0 ? 'working' : ''}}">{{statusSummary.working}}</text>
+        <text class="overview-label">工作中</text>
+      </view>
+      <view class="overview-item">
+        <text class="overview-count {{statusSummary.ready > 0 ? 'ready' : ''}}">{{statusSummary.ready}}</text>
+        <text class="overview-label">待取衣</text>
       </view>
     </view>
   </view>
 
-  <!-- 快速操作区域 -->
-  <view class="quick-actions">
-    <view class="action-item" bindtap="goToBuilding">
-      <view class="action-icon building-icon">🏢</view>
-      <text class="action-text">选择楼栋</text>
-    </view>
-    <view class="action-item" bindtap="goToBooking">
-      <view class="action-icon booking-icon">📅</view>
-      <text class="action-text">立即预约</text>
-    </view>
-    <view class="action-item" bindtap="goToMessage">
-      <view class="action-icon message-icon">💬</view>
-      <text class="action-text">消息中心</text>
-    </view>
-    <view class="action-item" bindtap="goToProfile">
-      <view class="action-icon profile-icon">👤</view>
-      <text class="action-text">个人中心</text>
-    </view>
-  </view>
-
-  <!-- 当前楼栋洗衣机状态 -->
-  <view class="washer-status-section" wx:if="{{currentBuilding}}">
+  <!-- 洗衣机列表 -->
+  <view class="washer-section">
     <view class="section-header">
-      <text class="section-title">{{currentBuilding.name}} 洗衣机状态</text>
-      <text class="refresh-btn" bindtap="refreshStatus">🔄 刷新</text>
+      <text class="section-title">洗衣机列表</text>
+      <view class="section-actions">
+        <text class="refresh-btn" bindtap="refreshStatus">刷新</text>
+      </view>
     </view>
-    
-    <view class="status-summary">
-      <view class="status-item">
-        <text class="status-count idle">{{statusSummary.idle}}</text>
-        <text class="status-label">空闲</text>
-      </view>
-      <view class="status-item">
-        <text class="status-count booking">{{statusSummary.booking}}</text>
-        <text class="status-label">预约中</text>
-      </view>
-      <view class="status-item">
-        <text class="status-count working">{{statusSummary.working}}</text>
-        <text class="status-label">工作中</text>
-      </view>
-      <view class="status-item">
-        <text class="status-count ready">{{statusSummary.ready}}</text>
-        <text class="status-label">待取衣</text>
-      </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:elif="{{!hasData && !loading}}">
+      <text class="empty-text">暂无洗衣机数据</text>
     </view>
 
     <!-- 洗衣机列表 -->
-    <view class="washer-list">
-      <view class="washer-item" wx:for="{{washerList}}" wx:key="id" bindtap="selectWasher" data-washer="{{item}}">
-        <view class="washer-info">
-          <view class="washer-name">{{item.name}}</view>
-          <view class="washer-location">{{item.location}}</view>
-        </view>
-        <view class="washer-status">
-          <view class="status-tag status-{{item.status}}">{{item.statusText}}</view>
-          <view class="status-detail" wx:if="{{item.remainingTime}}">
-            <text class="time-text">{{item.remainingTime}}</text>
+    <scroll-view class="washer-list" scroll-y wx:else>
+      <block wx:for="{{washerList}}" wx:key="id">
+        <view class="washer-item {{item.status}}" bindtap="selectWasher" data-washer="{{item}}">
+          <view class="washer-info">
+            <view class="washer-header">
+              <text class="washer-name">{{item.name}}</text>
+              <view class="washer-status {{item.status}}">
+                <text>{{item.statusText}}</text>
+              </view>
+            </view>
+            <view class="washer-details">
+              <text class="washer-location">{{item.location}}</text>
+              <text class="washer-type">{{item.type}} · {{item.capacity}}</text>
+            </view>
+            <view class="washer-footer">
+              <text class="washer-price">￥{{item.pricePerHour}}/小时</text>
+              <text class="washer-remaining" wx:if="{{item.remainingTime}}">{{item.remainingTime}}</text>
+            </view>
+          </view>
+          <view class="washer-action">
+            <text class="action-arrow">›</text>
           </view>
         </view>
-        <view class="washer-action">
-          <view class="action-btn" wx:if="{{item.status === 'idle'}}">立即预约</view>
-          <view class="action-btn disabled" wx:else>暂不可用</view>
-        </view>
-      </view>
-    </view>
+      </block>
+    </scroll-view>
   </view>
 
-  <!-- 推荐时段 -->
+  <!-- 智能推荐 -->
   <view class="recommendation-section" wx:if="{{recommendations.length > 0}}">
     <view class="section-header">
       <text class="section-title">智能推荐</text>
     </view>
     <view class="recommendation-list">
-      <view class="recommendation-item" wx:for="{{recommendations}}" wx:key="id">
-        <view class="recommendation-time">{{item.time}}</view>
-        <view class="recommendation-desc">{{item.description}}</view>
-        <view class="recommendation-score">
-          <text class="score-text">推荐度: {{item.score}}%</text>
+      <block wx:for="{{recommendations}}" wx:key="id">
+        <view class="recommendation-item">
+          <view class="recommendation-time">
+            <text class="time-slot">{{item.time}}</text>
+            <text class="time-date">{{item.date}}</text>
+          </view>
+          <view class="recommendation-content">
+            <text class="recommendation-desc">{{item.description}}</text>
+            <view class="recommendation-score">
+              <text class="score-text">推荐度</text>
+              <text class="score-value">{{item.score}}%</text>
+            </view>
+          </view>
         </view>
-      </view>
+      </block>
     </view>
   </view>
 
-  <!-- 公告信息 -->
+  <!-- 公告通知 -->
   <view class="notice-section" wx:if="{{notices.length > 0}}">
     <view class="section-header">
-      <text class="section-title">系统公告</text>
+      <text class="section-title">公告通知</text>
     </view>
     <view class="notice-list">
-      <view class="notice-item" wx:for="{{notices}}" wx:key="id" bindtap="viewNotice" data-notice="{{item}}">
-        <view class="notice-content">
-          <text class="notice-title">{{item.title}}</text>
-          <text class="notice-time">{{item.time}}</text>
+      <block wx:for="{{notices}}" wx:key="id">
+        <view class="notice-item" bindtap="viewNotice" data-notice="{{item}}">
+          <view class="notice-icon">📢</view>
+          <view class="notice-content">
+            <text class="notice-title">{{item.title}}</text>
+            <text class="notice-time">{{item.time}}</text>
+          </view>
+          <view class="notice-arrow">›</view>
         </view>
-        <view class="notice-arrow">></view>
-      </view>
+      </block>
     </view>
   </view>
-</view>
 
-<!-- 加载状态 -->
-<view class="loading" wx:if="{{loading}}">
-  <view class="loading-spinner"></view>
-  <text class="loading-text">加载中...</text>
+  <!-- 底部安全区域 -->
+  <view class="safe-area"></view>
 </view>

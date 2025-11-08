@@ -199,12 +199,7 @@ Page({
       icon: 'success'
     })
     
-    // 跳转到首页
-    setTimeout(() => {
-      wx.switchTab({
-        url: '/pages/index/index'
-      })
-    }, 1500)
+    // 不再跳转到首页，只关闭弹窗
   },
 
   // 关闭详情弹窗
@@ -263,28 +258,11 @@ Page({
 
   // 刷新位置
   refreshLocation() {
-    wx.showLoading({ title: '定位中...' })
-    
-    wx.getLocation({
-      type: 'gcj02',
-      success: (res) => {
-        app.getBuildingByLocation(res.latitude, res.longitude)
-        this.setData({
-          currentBuilding: app.globalData.currentBuilding
-        })
-        wx.hideLoading()
-        wx.showToast({
-          title: '定位成功',
-          icon: 'success'
-        })
-      },
-      fail: (err) => {
-        wx.hideLoading()
-        wx.showToast({
-          title: '定位失败',
-          icon: 'none'
-        })
-      }
+    // 直接刷新楼栋数据，不显示定位
+    this.loadBuildings()
+    wx.showToast({
+      title: '刷新成功',
+      icon: 'success'
     })
   },
 

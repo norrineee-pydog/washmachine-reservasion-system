@@ -33,7 +33,7 @@
   <!-- 功能菜单 -->
   <view class="menu-section">
     <view class="menu-group">
-      <view class="menu-item" bindtap="goToPage" data-url="/pages/booking/booking">
+      <view class="menu-item" bindtap="goToPage" data-url="/pages/my-booking/my-booking">
         <view class="menu-icon booking">📅</view>
         <text class="menu-text">我的预约</text>
         <view class="menu-badge" wx:if="{{bookingCount > 0}}">{{bookingCount}}</view>
@@ -130,25 +130,5 @@
   <!-- 登录按钮 -->
   <view class="login-section" wx:if="{{!userInfo}}">
     <button class="login-btn" bindtap="goToLogin">立即登录</button>
-  </view>
-</view>
-<!-- 我的预约 -->
-<view class="reservation-section" wx:if="{{myReservations.length > 0}}">
-  <view class="section-header">
-    <text class="section-title">我的预约</text>
-  </view>
-  
-  <view class="reservation-list">
-    <view class="reservation-item" wx:for="{{myReservations}}" wx:key="id" bindtap="viewReservationDetail" data-reservation="{{item}}">
-      <view class="reservation-info">
-        <text class="reservation-machine">{{item.machineName}}</text>
-        <text class="reservation-location">{{item.location}}</text>
-        <text class="reservation-time">{{item.date}} {{item.time}}</text>
-      </view>
-      <view class="reservation-status">
-        <view class="status-tag status-{{item.status}}">{{item.statusText}}</view>
-        <text class="reservation-price">{{item.totalPrice}}元</text>
-      </view>
-    </view>
   </view>
 </view>

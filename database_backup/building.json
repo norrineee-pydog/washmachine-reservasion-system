@@ -1,0 +1,3 @@
+{"_id":"building_001","name":"东区1号楼","floors":6.0,"idleCount":8.0,"washerCount":12.0,"latitude":31.2756,"longitude":121.5,"createTime":"2024-01-20 10:00:00"}
+{"_id":"building_002","name":"东区2号楼","floors":6.0,"washerCount":12.0,"idleCount":6.0,"workingCount":6.0,"latitude":31.2758,"longitude":121.5002,"createTime":"2024-01-20 10:00:00"}
+{"_id":"building_003","name":"西区1号楼","floors":6.0,"washerCount":16.0,"idleCount":10.0,"workingCount":6.0,"latitude":31.275,"longitude":121.4998,"createTime":"2024-01-20 10:00:00"}

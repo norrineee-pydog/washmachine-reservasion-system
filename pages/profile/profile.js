@@ -13,8 +13,7 @@ Page({
       avgWaitTime: 0,
       totalTime: 0
     },
-    recentActivities: [],
-    myReservations: [] // 新增：我的预约列表
+    recentActivities: []
   },
 
   onLoad() {
@@ -25,12 +24,12 @@ Page({
   onShow() {
     console.log('个人中心页面显示')
     this.loadUserData()
-    this.loadMyReservations() // 新增：加载我的预约
+    this.loadStatistics() // 加载统计数据
   },
 
   onPullDownRefresh() {
     this.loadUserData()
-    this.loadMyReservations()
+    this.loadStatistics()
     wx.stopPullDownRefresh()
   },
 
@@ -39,7 +38,6 @@ Page({
     this.loadUserData()
     this.loadStatistics()
     this.loadRecentActivities()
-    this.loadMyReservations()
   },
 
   // 加载用户数据
@@ -53,51 +51,6 @@ Page({
     }
   },
 
-  // 加载我的预约 - 新增方法
-  loadMyReservations() {
-    if (!this.data.userInfo) {
-      console.log('用户未登录，不加载预约数据')
-      return
-    }
-
-    const db = wx.cloud.database()
-    
-    // 查询当前用户的所有预约，按时间倒序排列
-    db.collection('reservations')
-      .where({
-        userId: this.data.userInfo.userId || 'user_001' // 使用实际用户ID
-      })
-      .orderBy('reservationDateTime', 'desc')
-      .get()
-      .then(res => {
-        console.log('获取我的预约成功:', res.data)
-        
-        const reservations = res.data.map(item => {
-          return {
-            id: item._id,
-            machineName: item.machineName,
-            location: item.machineLocation,
-            date: item.reservationDate,
-            time: item.reservationTime,
-            status: item.status,
-            statusText: this.getReservationStatusText(item.status),
-            duration: item.duration,
-            totalPrice: item.totalPrice
-          }
-        })
-        
-        this.setData({
-          myReservations: reservations,
-          bookingCount: reservations.filter(r => r.status === 'pending').length
-        })
-      })
-      .catch(err => {
-        console.error('获取我的预约失败:', err)
-        // 使用模拟数据
-        this.fallbackToMockReservations()
-      })
-  },
-
   // 获取预约状态文本
   getReservationStatusText(status) {
     const statusMap = {
@@ -107,39 +60,6 @@ Page({
       'cancelled': '已取消'
     }
     return statusMap[status] || '未知状态'
-  },
-
-  // 备用模拟预约数据
-  fallbackToMockReservations() {
-    const mockReservations = [
-      {
-        id: 1,
-        machineName: '滚筒洗衣机A',
-        location: '一楼洗衣房',
-        date: '2024-01-20',
-        time: '14:00-15:00',
-        status: 'pending',
-        statusText: '待确认',
-        duration: 60,
-        totalPrice: 5
-      },
-      {
-        id: 2,
-        machineName: '波轮洗衣机B',
-        location: '二楼洗衣房',
-        date: '2024-01-19',
-        time: '10:00-11:00',
-        status: 'completed',
-        statusText: '已完成',
-        duration: 60,
-        totalPrice: 5
-      }
-    ]
-    
-    this.setData({
-      myReservations: mockReservations,
-      bookingCount: mockReservations.filter(r => r.status === 'pending').length
-    })
   },
 
   // 计算信用积分进度
@@ -165,79 +85,167 @@ Page({
   },
 
   // 加载徽章数量
-  loadBadgeCounts() {
+  async loadBadgeCounts() {
     // 从本地存储读取已读消息ID列表
     const readMessages = wx.getStorageSync('readMessages') || []
     
     // 未读消息数量
     const messageCount = readMessages.includes(1) ? 0 : 1
     
+    // 从数据库加载待确认的预约数量
+    let bookingCount = 0
+    try {
+      const db = wx.cloud.database()
+      const userInfo = app.globalData.userInfo
+      
+      if (userInfo && userInfo._id) {
+        const res = await db.collection('reservations')
+          .where({
+            userId: userInfo._id,
+            status: 'pending'
+          })
+          .count()
+        
+        bookingCount = res.total || 0
+      }
+    } catch (error) {
+      console.error('加载预约数量失败:', error)
+    }
+    
     this.setData({
-      messageCount
+      messageCount,
+      bookingCount
     })
   },
 
   // 加载统计数据
-  loadStatistics() {
-    // 基于实际预约数据计算统计
-    const totalBookings = this.data.myReservations.length
-    const completedBookings = this.data.myReservations.filter(r => r.status === 'completed').length
-    const successRate = totalBookings > 0 ? Math.round((completedBookings / totalBookings) * 100) : 0
-    
-    const statistics = {
-      totalBookings: totalBookings,
-      successRate: successRate,
-      avgWaitTime: '5分钟',
-      totalTime: `${totalBookings}小时`
+  async loadStatistics() {
+    try {
+      const userInfo = app.globalData.userInfo
+      
+      if (!userInfo) {
+        this.setData({
+          statistics: {
+            totalBookings: 0,
+            successRate: 0,
+            avgWaitTime: '0分钟',
+            totalTime: '0小时'
+          }
+        })
+        return
+      }
+      
+      const res = await wx.cloud.callFunction({
+        name: 'getMyReservations',
+        data: {
+          filterStatus: 'all'
+        }
+      })
+      
+      const allReservations = (res.result && res.result.data) ? res.result.data : []
+      
+      const totalBookings = allReservations.length
+      const completedBookings = allReservations.filter(r =>
+        r.status === 'completed' || r.status === 'confirmed' || r.status === 'working'
+      ).length
+      const successRate = totalBookings > 0 ? Math.round((completedBookings / totalBookings) * 100) : 0
+      
+      const totalDuration = allReservations
+        .filter(r => r.duration)
+        .reduce((sum, r) => sum + Number(r.duration || 0), 0)
+      const totalHours = totalDuration > 0 ? (totalDuration / 60).toFixed(1) : '0'
+      
+      this.setData({
+        statistics: {
+          totalBookings: totalBookings,
+          successRate: successRate,
+          avgWaitTime: '5分钟',
+          totalTime: `${totalHours}小时`
+        }
+      })
+    } catch (error) {
+      console.error('加载统计数据失败:', error)
+      // 使用默认值
+      this.setData({
+        statistics: {
+          totalBookings: 0,
+          successRate: 0,
+          avgWaitTime: '0分钟',
+          totalTime: '0小时'
+        }
+      })
     }
-    
-    this.setData({ statistics })
   },
 
   // 加载最近活动 - 修改为基于预约数据
-  loadRecentActivities() {
-    const activities = this.data.myReservations.slice(0, 4).map(reservation => {
-      let type, icon, title
+  async loadRecentActivities() {
+    try {
+      const db = wx.cloud.database()
+      const userInfo = app.globalData.userInfo
       
-      switch(reservation.status) {
-        case 'completed':
-          type = 'completed'
-          icon = '✅'
-          title = `预约完成 - ${reservation.machineName}`
-          break
-        case 'pending':
-          type = 'booking'
-          icon = '📅'
-          title = `新建预约 - ${reservation.machineName}`
-          break
-        case 'cancelled':
-          type = 'cancelled'
-          icon = '❌'
-          title = `取消预约 - ${reservation.machineName}`
-          break
-        default:
-          type = 'booking'
-          icon = '📅'
-          title = `预约更新 - ${reservation.machineName}`
+      if (!userInfo || !userInfo._id) {
+        this.setData({ 
+          recentActivities: this.getDefaultActivities() 
+        })
+        return
       }
       
-      return {
-        id: reservation.id,
-        type: type,
-        icon: icon,
-        title: title,
-        time: reservation.date,
-        status: reservation.statusText
+      // 从数据库加载最近的预约记录
+      const res = await db.collection('reservations')
+        .where({
+          userId: userInfo._id
+        })
+        .orderBy('reservationDateTime', 'desc')
+        .limit(4)
+        .get()
+      
+      if (res.data && res.data.length > 0) {
+        const activities = res.data.map(reservation => {
+          let type, icon, title
+          
+          switch(reservation.status) {
+            case 'completed':
+              type = 'completed'
+              icon = '✅'
+              title = `预约完成 - ${reservation.machineName || '洗衣机'}`
+              break
+            case 'pending':
+              type = 'booking'
+              icon = '📅'
+              title = `新建预约 - ${reservation.machineName || '洗衣机'}`
+              break
+            case 'cancelled':
+              type = 'cancelled'
+              icon = '❌'
+              title = `取消预约 - ${reservation.machineName || '洗衣机'}`
+              break
+            default:
+              type = 'booking'
+              icon = '📅'
+              title = `预约更新 - ${reservation.machineName || '洗衣机'}`
+          }
+          
+          return {
+            id: reservation._id,
+            type: type,
+            icon: icon,
+            title: title,
+            time: reservation.reservationDate || '未知时间',
+            status: this.getReservationStatusText(reservation.status)
+          }
+        })
+        
+        this.setData({ recentActivities: activities })
+      } else {
+        this.setData({ 
+          recentActivities: this.getDefaultActivities() 
+        })
       }
-    })
-    
-    // 如果预约数据为空，使用默认活动
-    if (activities.length === 0) {
+    } catch (error) {
+      console.error('加载最近活动失败:', error)
       this.setData({ 
         recentActivities: this.getDefaultActivities() 
       })
-    } else {
-      this.setData({ recentActivities: activities })
     }
   },
 
@@ -261,14 +269,6 @@ Page({
         status: '预约中'
       }
     ]
-  },
-
-  // 查看预约详情
-  viewReservationDetail(e) {
-    const reservation = e.currentTarget.dataset.reservation
-    wx.navigateTo({
-      url: `/pages/booking-detail/booking-detail?id=${reservation.id}`
-    })
   },
 
   // 页面跳转
@@ -315,8 +315,7 @@ Page({
             userInfo: null,
             creditProgress: 0,
             bookingCount: 0,
-            messageCount: 0,
-            myReservations: []
+            messageCount: 0
           })
           
           wx.showToast({

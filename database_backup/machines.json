@@ -1,0 +1,2 @@
+{"_id":"machine_001","capacity":"8kg","description":"标准滚筒洗衣机，支持45/60分钟洗程","location":"一楼洗衣房A区","name":"滚筒洗衣机A","pricePerHour":5.0,"status":"reserved","type":"滚筒","sortOrder":1.0,"updateTime":"2025-11-08T03:13:59.556Z"}
+{"_id":"machine_002","location":"一楼洗衣房B区","name":"波轮洗衣机B","status":"available","type":"波轮","capacity":"7kg","pricePerHour":4.0,"sortOrder":2.0,"description":"快速洗衣机，适合25分钟快洗","updateTime":{"$date":"2025-11-06T02:00:00Z"}}

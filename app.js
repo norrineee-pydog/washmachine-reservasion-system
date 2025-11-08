@@ -4,29 +4,31 @@ App({
     userInfo: null,
     isLogin: false,
     currentBuilding: null,
-    apiBaseUrl: 'https://your-api-domain.com/api',
     version: '1.0.0'
   },
 
   onLaunch() {
     console.log('上大洗衣侠小程序启动')
+    this.initCloudDevelopment()
     this.checkLoginStatus()
     this.initLocation()
   },
-// 初始化云开发
-initCloudDevelopment() {
-  if (!wx.cloud) {
-    console.error('请使用 2.2.3 或以上的基础库以使用云能力')
-    return
-  }
-  
-  wx.cloud.init({
-    env: 'cloud1-5ggq2l2i9a7c56ed', // 你的环境ID
-    traceUser: true,
-  })
-  
-  console.log('云开发初始化完成')
-},
+
+  // 初始化云开发
+  initCloudDevelopment() {
+    if (!wx.cloud) {
+      console.error('请使用 2.2.3 或以上的基础库以使用云能力')
+      return
+    }
+    
+    wx.cloud.init({
+      env: 'cloud1-5ggq2l2i9a7c56ed',
+      traceUser: true,
+    })
+    
+    console.log('云开发初始化完成')
+  },
+
   onShow() {
     console.log('小程序显示')
   },
@@ -41,69 +43,52 @@ initCloudDevelopment() {
     if (userInfo) {
       this.globalData.userInfo = userInfo
       this.globalData.isLogin = true
+    } else {
+      // 如果没有用户信息，从user集合获取或创建默认用户
+      this.getOrCreateUser()
+    }
+  },
+
+  // 获取或创建用户
+  async getOrCreateUser() {
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'userProfile',
+        data: {
+          action: 'get'
+        }
+      })
+
+      if (res.result && res.result.success && res.result.data) {
+        this.globalData.userInfo = res.result.data
+        this.globalData.isLogin = true
+        wx.setStorageSync('userInfo', res.result.data)
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
     }
   },
 
   // 初始化位置服务
   initLocation() {
-    // 先设置默认楼栋，避免定位失败时显示"正在定位..."
     this.globalData.currentBuilding = {
       id: 1,
-      name: '东区1号楼',
-      floors: 6,
-      washerCount: 12,
-      idleCount: 8,
-      workingCount: 4
+      name: '一楼洗衣房',
+      floors: 1,
+      washerCount: 2,
+      idleCount: 2,
+      workingCount: 0
     }
     
     wx.getLocation({
       type: 'gcj02',
       success: (res) => {
         console.log('获取位置成功', res)
-        this.getBuildingByLocation(res.latitude, res.longitude)
       },
       fail: (err) => {
         console.log('获取位置失败', err)
-        // 使用默认楼栋已在上面设置
       }
     })
-  },
-
-  // 根据位置获取楼栋信息
-  getBuildingByLocation(lat, lng) {
-    // 这里应该调用后端API根据经纬度获取楼栋信息
-    // 暂时使用模拟数据
-    const buildings = [
-      { id: 1, name: '东区1号楼', lat: 31.2756, lng: 121.5000, floors: 6, washerCount: 12, idleCount: 8, workingCount: 4 },
-      { id: 2, name: '东区2号楼', lat: 31.2758, lng: 121.5002, floors: 6, washerCount: 12, idleCount: 6, workingCount: 6 },
-      { id: 3, name: '西区1号楼', lat: 31.2750, lng: 121.4998, floors: 8, washerCount: 16, idleCount: 10, workingCount: 6 }
-    ]
-    
-    // 简单的距离计算找到最近的楼栋
-    let nearestBuilding = buildings[0]
-    let minDistance = this.calculateDistance(lat, lng, buildings[0].lat, buildings[0].lng)
-    
-    buildings.forEach(building => {
-      const distance = this.calculateDistance(lat, lng, building.lat, building.lng)
-      if (distance < minDistance) {
-        minDistance = distance
-        nearestBuilding = building
-      }
-    })
-    
-    this.globalData.currentBuilding = nearestBuilding
-  },
-
-  // 计算两点间距离
-  calculateDistance(lat1, lng1, lat2, lng2) {
-    const R = 6371 // 地球半径
-    const dLat = (lat2 - lat1) * Math.PI / 180
-    const dLng = (lng2 - lng1) * Math.PI / 180
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLng/2) * Math.sin(dLng/2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
-    return R * c
   },
 
   // 用户登录
@@ -118,28 +103,5 @@ initCloudDevelopment() {
     this.globalData.userInfo = null
     this.globalData.isLogin = false
     wx.removeStorageSync('userInfo')
-  },
-
-  // 网络请求封装
-  request(options) {
-    return new Promise((resolve, reject) => {
-      wx.request({
-        url: this.globalData.apiBaseUrl + options.url,
-        method: options.method || 'GET',
-        data: options.data || {},
-        header: {
-          'Content-Type': 'application/json',
-          'Authorization': this.globalData.userInfo ? `Bearer ${this.globalData.userInfo.token}` : ''
-        },
-        success: (res) => {
-          if (res.statusCode === 200) {
-            resolve(res.data)
-          } else {
-            reject(res)
-          }
-        },
-        fail: reject
-      })
-    })
   }
 })

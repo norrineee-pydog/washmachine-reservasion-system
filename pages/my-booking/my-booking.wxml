@@ -1,0 +1,128 @@
+<!--pages/my-booking/my-booking.wxml-->
+<view class="container">
+  <!-- 顶部导航 -->
+  <view class="navbar">
+    <view class="navbar-content">
+      <view class="navbar-back" bindtap="onBack">
+        <text class="back-icon">‹</text>
+      </view>
+      <text class="navbar-title">我的预约</text>
+      <view class="navbar-refresh" bindtap="onRefresh">
+        <text class="refresh-icon">↻</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 状态筛选 -->
+  <view class="status-tabs">
+    <scroll-view class="tab-scroll" scroll-x>
+      <view class="tab-list">
+        <view 
+          wx:for="{{statusTabs}}" 
+          wx:key="key"
+          class="tab-item {{filterStatus === item.key ? 'active' : ''}}"
+          bindtap="onStatusTabChange"
+          data-status="{{item.key}}"
+        >
+          <text class="tab-text">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:elif="{{filteredBookings.length === 0 && !loading}}">
+    <view class="empty-icon">📅</view>
+    <text class="empty-text">{{emptyText}}</text>
+    <text class="empty-desc">快去预约一台洗衣机吧</text>
+  </view>
+
+  <!-- 预约列表 -->
+  <scroll-view class="booking-list" scroll-y wx:else>
+    <view 
+      class="booking-item" 
+      wx:for="{{filteredBookings}}" 
+      wx:key="id"
+      bindtap="viewBookingDetail"
+      data-booking="{{item}}"
+    >
+      <view class="booking-header">
+        <text class="machine-name">{{item.machineName}}</text>
+        <view class="status-tag status-{{item.status}}">
+          <text>{{item.statusText}}</text>
+        </view>
+      </view>
+      
+      <view class="booking-info">
+        <view class="info-item">
+          <text class="info-label">位置：</text>
+          <text class="info-value">{{item.location}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">类型：</text>
+          <text class="info-value">{{item.machineType}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">时间：</text>
+          <text class="info-value">{{item.date}} {{item.time}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">时长：</text>
+          <text class="info-value">{{item.duration}}分钟</text>
+        </view>
+      </view>
+
+      <view class="booking-footer">
+        <view class="price-section">
+          <text class="price-label">金额：</text>
+          <text class="price-value">¥{{item.totalPrice || 0}}</text>
+        </view>
+        
+        <view class="action-buttons">
+          <!-- 待确认状态：取消按钮 -->
+          <button 
+            class="btn btn-cancel" 
+            wx:if="{{item.status === 'pending' && item.paymentStatus === 'unpaid'}}"
+            catchtap="cancelBooking"
+            data-booking="{{item}}"
+          >取消预约</button>
+
+          <button 
+            class="btn btn-pay" 
+            wx:if="{{item.paymentStatus === 'unpaid'}}"
+            catchtap="payBooking"
+            data-booking="{{item}}"
+          >模拟付款</button>
+
+          <button 
+            class="btn btn-primary" 
+            wx:if="{{item.status === 'confirmed' && item.paymentStatus === 'paid'}}"
+            catchtap="startBooking"
+            data-booking="{{item}}"
+          >开始洗衣</button>
+
+          <button 
+            class="btn btn-success" 
+            wx:if="{{item.status === 'working'}}"
+            catchtap="completeBooking"
+            data-booking="{{item}}"
+          >完成洗衣</button>
+
+          <text 
+            class="paid-text" 
+            wx:if="{{item.status === 'completed'}}"
+          >已完成</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area"></view>
+</view>
