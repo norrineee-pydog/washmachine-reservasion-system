@@ -78,6 +78,7 @@ exports.main = async (event, context) => {
     }
 
     const now = db.serverDate()
+    const nowDate = new Date()
     const historyEntry = {
       action,
       fromStatus: reservation.status,
@@ -122,7 +123,13 @@ exports.main = async (event, context) => {
       }
 
       updateData.status = 'working'
+      const duration = reservation.duration || 60
+      const actualEndServerDate = db.serverDate({
+        offset: duration * 60 * 1000
+      })
       updateData.workStartTime = now
+      updateData.actualEndTime = actualEndServerDate
+      updateData.endTime = actualEndServerDate
       machineUpdate = {
         status: 'working',
         updateTime: now

@@ -330,11 +330,13 @@ Page({
           paymentDeadline: paymentDeadline.toString()
         })
 
+        const createMoment = booking.createTime ? this.parseTime(booking.createTime) : new Date()
+
         const currentBooking = {
           id: booking._id,
           buildingName: booking.machineLocation || '一楼洗衣房',
           washerName: booking.machineName,
-          bookingTime: this.formatTime(reservationDateTime),
+          bookingTime: this.formatTime(createMoment),
           status: booking.status || 'pending',
           paymentStatus: booking.paymentStatus || 'unpaid',
           statusText: this.getStatusText(booking.status, booking.paymentStatus),
@@ -369,6 +371,13 @@ Page({
     
     const updateCountdown = () => {
       const currentBooking = this.data.currentBooking
+
+      if (!currentBooking || !currentBooking.endTime) {
+        console.log('⌛ 当前预约已不存在或缺少结束时间，停止倒计时')
+        this.stopCountdown()
+        return
+      }
+
       const now = Date.now()
       const endTime = currentBooking.endTime
       

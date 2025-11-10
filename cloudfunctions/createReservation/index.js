@@ -132,7 +132,8 @@ exports.main = async (event, context) => {
           operator: 'system',
           timestamp: new Date().toISOString()
         }
-      ]
+      ],
+      latestDisplayTime: `${reservationDate} ${endTimeStr ? `${startTime}-${endTimeStr}` : computedTimeRange}`
     }
 
     console.log('📝 最终预约数据:', reservationData)

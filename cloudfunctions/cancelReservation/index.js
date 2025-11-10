@@ -115,21 +115,40 @@ exports.main = async (event, context) => {
     
     // 更新预约状态
     try {
-      const now = db.serverDate()
+      const now = new Date()
       await db.collection('reservations').doc(reservationId).update({
         data: {
           status: 'cancelled',
-          updateTime: now,
-          statusHistory: _.push([{ action: 'cancel', fromStatus: reservation.status, toStatus: 'cancelled', operator: 'user', timestamp: now }])
+          updateTime: db.serverDate(),
+          statusHistory: _.push([{ action: 'cancel', fromStatus: reservation.status, toStatus: 'cancelled', operator: 'user', timestamp: db.serverDate() }])
         }
       })
 
-      await adjustUserCredit({
-        userId: reservation.userId,
-        delta: -8,
-        reason: 'cancelReservation',
-        now
-      })
+      let creditDelta = -8
+      let reason = 'cancelReservation'
+
+      const createTime = reservation.createTime ? new Date(reservation.createTime) : null
+      const paymentDeadline = reservation.paymentDeadline ? new Date(reservation.paymentDeadline) : null
+      const isUnpaid = reservation.paymentStatus !== 'paid'
+      const isPending = reservation.status === 'pending'
+
+      if (isUnpaid && isPending && createTime && paymentDeadline) {
+        const timeSinceCreate = now.getTime() - createTime.getTime()
+        const paymentWindow = paymentDeadline.getTime() - createTime.getTime()
+        if (timeSinceCreate <= paymentWindow) {
+          creditDelta = 0
+          reason = 'cancelReservationEarly'
+        }
+      }
+
+      if (creditDelta !== 0) {
+        await adjustUserCredit({
+          userId: reservation.userId,
+          delta: creditDelta,
+          reason,
+          now
+        })
+      }
     } catch (error) {
       console.error('更新预约状态失败:', error)
       return {

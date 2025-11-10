@@ -11,7 +11,7 @@
         <text class="level-text">{{userInfo.level || '青铜'}}</text>
         <view class="level-progress">
           <view class="progress-bar">
-            <view class="progress-fill" style="width: {{creditProgress}}%"></view>
+            <view class="progress-fill" style="width: {{creditProgress}}"></view>
           </view>
           <text class="progress-text">{{creditProgress}}%</text>
         </view>
@@ -26,7 +26,7 @@
       <view class="rule-item">
         <view class="rule-icon positive">+</view>
         <text class="rule-text">按时使用预约</text>
-        <text class="rule-score">+2分</text>
+        <text class="rule-score">+5分</text>
       </view>
       <view class="rule-item">
         <view class="rule-icon positive">+</view>
